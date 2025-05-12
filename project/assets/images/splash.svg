@@ -1,0 +1,40 @@
+<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4A57C8" />
+      <stop offset="100%" stop-color="#6A77E8" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main background -->
+  <rect width="1024" height="1024" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="200" cy="200" r="50" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="800" cy="300" r="80" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="300" cy="800" r="100" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="700" cy="750" r="70" fill="rgba(255,255,255,0.1)"/>
+  
+  <!-- White circle for logo background -->
+  <circle cx="512" cy="412" r="150" fill="white"/>
+  
+  <!-- Pharmacy cross -->
+  <rect x="462" y="362" width="100" height="100" fill="#5A67D8"/>
+  <rect x="462" y="362" width="100" height="100" fill="#5A67D8"/>
+  
+  <!-- Vertical pill shape -->
+  <rect x="502" y="312" width="20" height="200" rx="10" fill="#5A67D8"/>
+  
+  <!-- Horizontal pill shape -->
+  <rect x="412" y="402" width="200" height="20" rx="10" fill="#5A67D8"/>
+  
+  <!-- App name -->
+  <text x="512" y="650" font-family="Arial" font-size="72" font-weight="bold" text-anchor="middle" fill="white">PharmaFlow</text>
+  
+  <!-- Tagline -->
+  <text x="512" y="700" font-family="Arial" font-size="36" text-anchor="middle" fill="white">Pharmacy Management System</text>
+  
+  <!-- Version number -->
+  <text x="512" y="950" font-family="Arial" font-size="24" text-anchor="middle" fill="rgba(255,255,255,0.7)">v1.0.0</text>
+</svg>

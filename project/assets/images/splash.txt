@@ -1,0 +1,17 @@
+SPLASH SCREEN REQUIRED
+
+A proper splash.png file (1024x1024px) needs to be created and placed in this directory.
+
+Please use the splash generator tool at assets/temp/splash-generator.html to create this file:
+1. Open the HTML file in any browser
+2. Upload a logo
+3. Adjust the settings
+4. Download the generated PNG
+5. Save it as "splash.png" in this directory
+
+Requirements:
+- Size: 1024x1024 pixels
+- Format: PNG with transparency
+- Content: PharmaFlow logo on appropriate background
+
+The app.json is already configured to use this file at path: ./assets/images/splash.png

@@ -1,0 +1,42 @@
+export const prescriptions = [
+  {
+    id: "PR001",
+    patient: "John Doe",
+    medication: "Amoxicillin",
+    dosage: "500mg",
+    status: "Pending",
+    date: "2024-04-21",
+  },
+  {
+    id: "PR002",
+    patient: "Jane Smith",
+    medication: "Ibuprofen",
+    dosage: "200mg",
+    status: "Completed",
+    date: "2024-04-20",
+  },
+  {
+    id: "PR003",
+    patient: "Robert Johnson",
+    medication: "Lisinopril",
+    dosage: "10mg",
+    status: "In Progress",
+    date: "2024-04-19",
+  },
+  {
+    id: "PR004",
+    patient: "Emily Davis",
+    medication: "Metformin",
+    dosage: "1000mg",
+    status: "Pending",
+    date: "2024-04-18",
+  },
+  {
+    id: "PR005",
+    patient: "Michael Wilson",
+    medication: "Atorvastatin",
+    dosage: "20mg",
+    status: "Completed",
+    date: "2024-04-17",
+  },
+] 

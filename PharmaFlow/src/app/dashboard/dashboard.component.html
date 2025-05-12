@@ -1,0 +1,90 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <div class="container">
+      <div class="header-content">
+        <div class="header-title">
+          <mat-icon>dashboard</mat-icon>
+          <h1>Tableau de bord</h1>
+        </div>
+        <p class="header-subtitle">Visualisez toutes les métriques importantes de votre pharmacie</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <app-dashboard-cards></app-dashboard-cards>
+
+    <div class="dashboard-tabs">
+      <mat-tab-group [(selectedIndex)]="activeTab" animationDuration="0ms">
+        <mat-tab label="Aperçu">
+          <div class="tab-content">
+            <div class="dashboard-grid">
+              <mat-card class="chart-card">
+                <mat-card-header>
+                  <mat-card-title>Aperçu des ventes</mat-card-title>
+                  <mat-card-subtitle>Évolution des ventes et achats sur les 7 derniers mois</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  <!-- Chart component will go here -->
+                  <div class="chart-placeholder">
+                    <p>Graphique des ventes</p>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+              <mat-card class="sales-card">
+                <mat-card-header>
+                  <mat-card-title>Ventes Récentes</mat-card-title>
+                  <mat-card-subtitle>Vous avez effectué 128 ventes aujourd'hui.</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="recent-sales">
+                    <!-- Recent sales list will go here -->
+                    <div class="sale-item" *ngFor="let i of [1, 2, 3, 4, 5]">
+                      <div class="sale-avatar">
+                        <span>C{{i}}</span>
+                      </div>
+                      <div class="sale-details">
+                        <div class="sale-name">Client {{i}}</div>
+                        <div class="sale-email">client{{i}}@example.com</div>
+                      </div>
+                      <div class="sale-amount">+{{i * 100}}.00 MAD</div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Alertes">
+          <div class="tab-content">
+            <app-alerts-panel></app-alerts-panel>
+          </div>
+        </mat-tab>
+        <mat-tab label="Inventaire">
+          <div class="tab-content">
+            <app-medications-list></app-medications-list>
+          </div>
+        </mat-tab>
+        <mat-tab label="Clients">
+          <div class="tab-content">
+            <app-clients-list></app-clients-list>
+          </div>
+        </mat-tab>
+        <mat-tab label="Calendrier">
+          <div class="tab-content">
+            <app-calendar-view></app-calendar-view>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <div class="quick-access-section">
+      <div class="section-header">
+        <div class="section-indicator"></div>
+        <h2>Accès rapide</h2>
+      </div>
+      <app-quick-access></app-quick-access>
+    </div>
+  </div>
+</div>

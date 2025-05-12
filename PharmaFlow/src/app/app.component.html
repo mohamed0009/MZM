@@ -1,0 +1,14 @@
+<div class="app-container">
+  <ng-container *ngIf="!isAuthPage; else authContent">
+    <app-header></app-header>
+    <div class="content-container">
+      <router-outlet></router-outlet>
+    </div>
+  </ng-container>
+  
+  <ng-template #authContent>
+    <div class="auth-container">
+      <router-outlet></router-outlet>
+    </div>
+  </ng-template>
+</div>

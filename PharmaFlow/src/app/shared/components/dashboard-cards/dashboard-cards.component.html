@@ -1,0 +1,12 @@
+<div class="dashboard-cards">
+  <mat-card *ngFor="let card of cards" class="stat-card" [ngClass]="'card-' + card.color">
+    <div class="card-icon">
+      <mat-icon>{{ card.icon }}</mat-icon>
+    </div>
+    <div class="card-content">
+      <div class="card-title">{{ card.title }}</div>
+      <div class="card-value">{{ card.value }}</div>
+      <div class="card-change">{{ card.change }}</div>
+    </div>
+  </mat-card>
+</div>

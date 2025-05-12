@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "PharmaFlow",
+    "slug": "pharmaflow",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#00AA78"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "icon": "./assets/images/logo.png"
+    },
+    "android": {
+      "icon": "./assets/images/logo.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#00AA78"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/logo.png",
+      "splash": {
+        "image": "./assets/images/logo.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#00AA78"
+      },
+      "icons": [
+        {
+          "src": "./assets/images/logo.png",
+          "sizes": "1024x1024",
+          "type": "image/png"
+        }
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
