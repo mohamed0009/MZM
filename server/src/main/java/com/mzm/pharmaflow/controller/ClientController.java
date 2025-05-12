@@ -2,6 +2,8 @@ package com.mzm.pharmaflow.controller;
 
 import com.mzm.pharmaflow.dto.ClientDTO;
 import com.mzm.pharmaflow.dto.ResponseDTO;
+import com.mzm.pharmaflow.service.ClientService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +19,12 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"})
 public class ClientController {
 
-    // Inject service here (code omitted for brevity)
+    private final ClientService clientService;
+    
+    @Autowired
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
+    }
     
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -75,7 +82,7 @@ public class ClientController {
     public ResponseEntity<ResponseDTO> deleteClient(@PathVariable @NotNull Long id) {
         try {
             clientService.delete(id);
-            return ResponseEntity.ok(new ResponseDTO("Client deleted successfully"));
+            return ResponseEntity.ok(new ResponseDTO(true, "Client deleted successfully"));
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, 
                 "Error deleting client: " + e.getMessage(), e);

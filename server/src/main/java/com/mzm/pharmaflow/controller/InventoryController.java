@@ -2,6 +2,8 @@ package com.mzm.pharmaflow.controller;
 
 import com.mzm.pharmaflow.dto.ProductDTO;
 import com.mzm.pharmaflow.dto.ResponseDTO;
+import com.mzm.pharmaflow.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +18,12 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"})
 public class InventoryController {
 
-    // Inject service here (code omitted for brevity)
+    private final ProductService productService;
+    
+    @Autowired
+    public InventoryController(ProductService productService) {
+        this.productService = productService;
+    }
     
     @GetMapping("/products")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -74,7 +81,7 @@ public class InventoryController {
     public ResponseEntity<ResponseDTO> deleteProduct(@PathVariable Long id) {
         try {
             productService.delete(id);
-            return ResponseEntity.ok(new ResponseDTO("Product deleted successfully"));
+            return ResponseEntity.ok(new ResponseDTO(true, "Product deleted successfully"));
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, 
                 "Error deleting product: " + e.getMessage(), e);

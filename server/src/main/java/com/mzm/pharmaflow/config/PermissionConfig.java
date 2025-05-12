@@ -1,66 +1,79 @@
 package com.mzm.pharmaflow.config;
 
-import com.mzm.pharmaflow.dto.RoleConstants;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Configuration des permissions par rôle, alignée avec le contexte d'authentification frontend.
- * Cette classe reproduit la même structure de permissions que celle définie dans auth-context.tsx.
+ * Configuration for role-based permissions.
+ * Defines which roles have access to which permissions.
  */
 @Configuration
 public class PermissionConfig {
 
-    @Bean
-    public Map<String, Set<String>> rolePermissionsMap() {
-        Map<String, Set<String>> permissions = new HashMap<>();
+    private final Map<String, Set<String>> rolePermissionsMap = new HashMap<>();
+
+    public PermissionConfig() {
+        // Initialize permissions for different roles
         
-        // Permissions pour ADMIN - toutes les permissions
-        permissions.put(RoleConstants.ROLE_ADMIN, new HashSet<>(Arrays.asList(
-            RoleConstants.PERMISSION_MANAGE_USERS,
-            RoleConstants.PERMISSION_VIEW_REPORTS,
-            RoleConstants.PERMISSION_MANAGE_INVENTORY,
-            RoleConstants.PERMISSION_APPROVE_PRESCRIPTIONS,
-            RoleConstants.PERMISSION_MANAGE_CLIENTS,
-            RoleConstants.PERMISSION_VIEW_DASHBOARD
-        )));
+        // Admin permissions
+        Set<String> adminPermissions = new HashSet<>();
+        adminPermissions.add("inventory.view");
+        adminPermissions.add("inventory.add");
+        adminPermissions.add("inventory.edit");
+        adminPermissions.add("inventory.delete");
+        adminPermissions.add("clients.view");
+        adminPermissions.add("clients.add");
+        adminPermissions.add("clients.edit");
+        adminPermissions.add("clients.delete");
+        adminPermissions.add("users.view");
+        adminPermissions.add("users.add");
+        adminPermissions.add("users.edit");
+        adminPermissions.add("users.delete");
+        adminPermissions.add("reports.view");
+        adminPermissions.add("reports.generate");
+        rolePermissionsMap.put("ROLE_ADMIN", adminPermissions);
         
-        // Permissions pour PHARMACIST
-        permissions.put(RoleConstants.ROLE_PHARMACIST, new HashSet<>(Arrays.asList(
-            RoleConstants.PERMISSION_VIEW_REPORTS,
-            RoleConstants.PERMISSION_MANAGE_INVENTORY,
-            RoleConstants.PERMISSION_APPROVE_PRESCRIPTIONS,
-            RoleConstants.PERMISSION_MANAGE_CLIENTS,
-            RoleConstants.PERMISSION_VIEW_DASHBOARD
-        )));
+        // Pharmacist permissions
+        Set<String> pharmacistPermissions = new HashSet<>();
+        pharmacistPermissions.add("inventory.view");
+        pharmacistPermissions.add("inventory.add");
+        pharmacistPermissions.add("inventory.edit");
+        pharmacistPermissions.add("clients.view");
+        pharmacistPermissions.add("clients.add");
+        pharmacistPermissions.add("clients.edit");
+        pharmacistPermissions.add("reports.view");
+        rolePermissionsMap.put("ROLE_PHARMACIST", pharmacistPermissions);
         
-        // Permissions pour TECHNICIAN
-        permissions.put(RoleConstants.ROLE_TECHNICIAN, new HashSet<>(Arrays.asList(
-            RoleConstants.PERMISSION_MANAGE_INVENTORY,
-            RoleConstants.PERMISSION_MANAGE_CLIENTS,
-            RoleConstants.PERMISSION_VIEW_DASHBOARD
-        )));
-        
-        return permissions;
+        // User permissions
+        Set<String> userPermissions = new HashSet<>();
+        userPermissions.add("inventory.view");
+        userPermissions.add("clients.view");
+        rolePermissionsMap.put("ROLE_USER", userPermissions);
     }
-    
+
     /**
-     * Vérifie si un rôle a une permission spécifique.
-     * Cette méthode peut être utilisée par les services ou contrôleurs pour vérifier les permissions.
+     * Checks if a role has a specific permission.
      * 
-     * @param role le rôle de l'utilisateur
-     * @param permission la permission à vérifier
-     * @return true si le rôle a la permission, false sinon
+     * @param role the role to check
+     * @param permission the permission to check for
+     * @return true if the role has the permission, false otherwise
      */
     public boolean hasPermission(String role, String permission) {
-        Map<String, Set<String>> permissionsMap = rolePermissionsMap();
-        
-        if (!permissionsMap.containsKey(role)) {
-            return false;
-        }
-        
-        return permissionsMap.get(role).contains(permission);
+        Set<String> permissions = rolePermissionsMap.getOrDefault(role, Collections.emptySet());
+        return permissions.contains(permission);
+    }
+
+    /**
+     * Gets all role-permission mappings.
+     * 
+     * @return the map of roles to their permissions
+     */
+    public Map<String, Set<String>> rolePermissionsMap() {
+        return rolePermissionsMap;
     }
 } 

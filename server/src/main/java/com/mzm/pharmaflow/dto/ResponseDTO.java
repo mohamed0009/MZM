@@ -4,45 +4,49 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Standard response DTO for API operations
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class ResponseDTO {
+    private boolean success;
     private String message;
     private Object data;
-    private boolean success;
+    private List<Map<String, String>> errors;
     private long timestamp = System.currentTimeMillis();
     
-    public ResponseDTO(String message) {
+    public ResponseDTO(boolean success, String message) {
+        this.success = success;
         this.message = message;
-        this.success = true;
     }
     
-    public ResponseDTO(String message, Object data) {
+    public ResponseDTO(boolean success, String message, Object data) {
+        this.success = success;
         this.message = message;
         this.data = data;
-        this.success = true;
     }
     
-    public ResponseDTO(String message, boolean success) {
-        this.message = message;
+    public ResponseDTO(boolean success, Object data) {
         this.success = success;
+        this.data = data;
     }
     
     public static ResponseDTO success(String message) {
-        return new ResponseDTO(message, true);
+        return new ResponseDTO(true, message);
     }
     
     public static ResponseDTO success(String message, Object data) {
-        ResponseDTO response = new ResponseDTO(message, true);
+        ResponseDTO response = new ResponseDTO(true, message);
         response.setData(data);
         return response;
     }
     
     public static ResponseDTO error(String message) {
-        return new ResponseDTO(message, false);
+        return new ResponseDTO(false, message);
     }
 } 

@@ -4,12 +4,31 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
+import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class LoginResponse {
     private String token;
-    private Map<String, Object> user;
+    private Long id;
+    private String username;
+    private String email;
+    private List<String> roles;
+    
+    // For backward compatibility
+    private Object user;
+    
+    public LoginResponse(String token, Object user) {
+        this.token = token;
+        this.user = user;
+    }
+    
+    public LoginResponse(String token, Long id, String username, String email, List<String> roles) {
+        this.token = token;
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.roles = roles;
+    }
 } 
