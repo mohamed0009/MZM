@@ -1,48 +1,60 @@
 "use client"
 
-import * as React from "react"
-import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
+import React, { forwardRef, HTMLAttributes, ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
-import { cn } from "@/lib/utils"
+interface ScrollAreaProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode
+  maxHeight?: string
+  withShadows?: boolean
+  hideScrollbar?: boolean
+  autoHeight?: boolean
+}
 
-const ScrollArea = React.forwardRef<
-  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-))
-ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
+const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
+  ({ 
+    children, 
+    maxHeight = '300px', 
+    withShadows = false, 
+    hideScrollbar = false,
+    autoHeight = false,
+    className, 
+    ...props 
+  }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'overflow-auto relative',
+          withShadows && 'scroll-shadow',
+          hideScrollbar && 'hide-scrollbar',
+          autoHeight ? 'max-h-full h-auto' : '',
+          className
+        )}
+        style={{ 
+          maxHeight: autoHeight ? 'none' : maxHeight,
+          ...(props.style || {})
+        }}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
 
-const ScrollBar = React.forwardRef<
-  React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
->(({ className, orientation = "vertical", ...props }, ref) => (
-  <ScrollAreaPrimitive.ScrollAreaScrollbar
-    ref={ref}
-    orientation={orientation}
-    className={cn(
-      "flex touch-none select-none transition-colors",
-      orientation === "vertical" &&
-        "h-full w-2.5 border-l border-l-transparent p-[1px]",
-      orientation === "horizontal" &&
-        "h-2.5 flex-col border-t border-t-transparent p-[1px]",
-      className
-    )}
-    {...props}
-  >
-    <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />
-  </ScrollAreaPrimitive.ScrollAreaScrollbar>
-))
-ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
+ScrollArea.displayName = 'ScrollArea'
 
-export { ScrollArea, ScrollBar }
+export { ScrollArea }
+
+// Usage example in components:
+//
+// <ScrollArea maxHeight="400px" withShadows={true}>
+//   {/* Your scrollable content here */}
+// </ScrollArea>
+//
+// Features:
+// - Custom scrollbar styling that matches your design
+// - Optional shadow indicators when content can be scrolled
+// - Ability to hide scrollbar for cleaner designs
+// - Configurable max height or auto-height
