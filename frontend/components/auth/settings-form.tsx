@@ -100,94 +100,115 @@ export function SettingsForm() {
 
   return (
     <Tabs defaultValue="notifications" className="w-full">
-      <TabsList className="grid w-full max-w-md grid-cols-3">
-        <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        <TabsTrigger value="appearance">Apparence</TabsTrigger>
-        <TabsTrigger value="security">Sécurité</TabsTrigger>
+      <TabsList className="bg-white rounded-xl overflow-hidden border border-slate-100 p-1 shadow-sm mb-6">
+        <TabsTrigger 
+          value="notifications" 
+          className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+        >
+          Notifications
+        </TabsTrigger>
+        <TabsTrigger 
+          value="appearance" 
+          className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+        >
+          Apparence
+        </TabsTrigger>
+        <TabsTrigger 
+          value="security" 
+          className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+        >
+          Sécurité
+        </TabsTrigger>
       </TabsList>
 
       {success && (
-        <Alert className="mt-4 bg-green-50 text-green-800 border-green-200">
+        <Alert className="mb-6 bg-green-50 text-green-700 border border-green-100">
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
 
       <TabsContent value="notifications">
-        <Card className="max-w-2xl mx-auto border-0 shadow-md">
-          <CardHeader>
-            <CardTitle>Paramètres de notifications</CardTitle>
-            <CardDescription>Configurez comment et quand vous souhaitez recevoir des notifications</CardDescription>
+        <Card className="max-w-2xl mx-auto border-none shadow-md rounded-xl overflow-hidden">
+          <CardHeader className="bg-white border-b border-slate-100 p-6">
+            <CardTitle className="text-xl font-bold text-slate-800">Paramètres de notifications</CardTitle>
+            <CardDescription className="text-slate-500">
+              Configurez comment et quand vous souhaitez recevoir des notifications
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Canaux de notification</h3>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="email-notifications">Notifications par email</Label>
-                  <p className="text-sm text-muted-foreground">Recevez des notifications par email</p>
+          <CardContent className="p-6 space-y-8">
+            <div className="space-y-6">
+              <h3 className="text-lg font-medium text-slate-800">Canaux de notification</h3>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 space-y-4">
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="email-notifications" className="text-sm font-medium text-slate-700">Notifications par email</Label>
+                    <p className="text-sm text-slate-500">Recevez des notifications par email</p>
+                  </div>
+                  <Switch
+                    id="email-notifications"
+                    checked={settings.notifications.email}
+                    onCheckedChange={() => handleNotificationChange("email")}
+                  />
                 </div>
-                <Switch
-                  id="email-notifications"
-                  checked={settings.notifications.email}
-                  onCheckedChange={() => handleNotificationChange("email")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="browser-notifications">Notifications du navigateur</Label>
-                  <p className="text-sm text-muted-foreground">Recevez des notifications dans votre navigateur</p>
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="browser-notifications" className="text-sm font-medium text-slate-700">Notifications du navigateur</Label>
+                    <p className="text-sm text-slate-500">Recevez des notifications dans votre navigateur</p>
+                  </div>
+                  <Switch
+                    id="browser-notifications"
+                    checked={settings.notifications.browser}
+                    onCheckedChange={() => handleNotificationChange("browser")}
+                  />
                 </div>
-                <Switch
-                  id="browser-notifications"
-                  checked={settings.notifications.browser}
-                  onCheckedChange={() => handleNotificationChange("browser")}
-                />
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Types de notifications</h3>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="stock-alerts">Alertes de stock</Label>
-                  <p className="text-sm text-muted-foreground">Notifications lorsque le stock est faible</p>
+            <div className="space-y-6">
+              <h3 className="text-lg font-medium text-slate-800">Types de notifications</h3>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 space-y-4">
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="stock-alerts" className="text-sm font-medium text-slate-700">Alertes de stock</Label>
+                    <p className="text-sm text-slate-500">Notifications lorsque le stock est faible</p>
+                  </div>
+                  <Switch
+                    id="stock-alerts"
+                    checked={settings.notifications.stockAlerts}
+                    onCheckedChange={() => handleNotificationChange("stockAlerts")}
+                  />
                 </div>
-                <Switch
-                  id="stock-alerts"
-                  checked={settings.notifications.stockAlerts}
-                  onCheckedChange={() => handleNotificationChange("stockAlerts")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="expiry-alerts">Alertes d'expiration</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Notifications pour les produits qui vont bientôt expirer
-                  </p>
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="expiry-alerts" className="text-sm font-medium text-slate-700">Alertes d'expiration</Label>
+                    <p className="text-sm text-slate-500">
+                      Notifications pour les produits qui vont bientôt expirer
+                    </p>
+                  </div>
+                  <Switch
+                    id="expiry-alerts"
+                    checked={settings.notifications.expiryAlerts}
+                    onCheckedChange={() => handleNotificationChange("expiryAlerts")}
+                  />
                 </div>
-                <Switch
-                  id="expiry-alerts"
-                  checked={settings.notifications.expiryAlerts}
-                  onCheckedChange={() => handleNotificationChange("expiryAlerts")}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="order-updates">Mises à jour des commandes</Label>
-                  <p className="text-sm text-muted-foreground">Notifications pour les mises à jour de commandes</p>
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="order-updates" className="text-sm font-medium text-slate-700">Mises à jour des commandes</Label>
+                    <p className="text-sm text-slate-500">Notifications pour les mises à jour de commandes</p>
+                  </div>
+                  <Switch
+                    id="order-updates"
+                    checked={settings.notifications.orderUpdates}
+                    onCheckedChange={() => handleNotificationChange("orderUpdates")}
+                  />
                 </div>
-                <Switch
-                  id="order-updates"
-                  checked={settings.notifications.orderUpdates}
-                  onCheckedChange={() => handleNotificationChange("orderUpdates")}
-                />
               </div>
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="px-6 py-4 bg-slate-50 border-t border-slate-200">
             <Button
               onClick={handleSaveSettings}
-              className="ml-auto bg-pharma-primary hover:bg-pharma-primary/90"
+              className="ml-auto bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white shadow-sm"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -204,20 +225,22 @@ export function SettingsForm() {
       </TabsContent>
 
       <TabsContent value="appearance">
-        <Card className="max-w-2xl mx-auto border-0 shadow-md">
-          <CardHeader>
-            <CardTitle>Paramètres d'apparence</CardTitle>
-            <CardDescription>Personnalisez l'apparence de l'application selon vos préférences</CardDescription>
+        <Card className="max-w-2xl mx-auto border-none shadow-md rounded-xl overflow-hidden">
+          <CardHeader className="bg-white border-b border-slate-100 p-6">
+            <CardTitle className="text-xl font-bold text-slate-800">Paramètres d'apparence</CardTitle>
+            <CardDescription className="text-slate-500">
+              Personnalisez l'apparence de l'application selon vos préférences
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="theme">Thème</Label>
+          <CardContent className="p-6 space-y-6">
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 space-y-6">
+              <div className="space-y-3">
+                <Label htmlFor="theme" className="text-sm font-medium text-slate-700">Thème</Label>
                 <Select
                   value={settings.appearance.theme}
                   onValueChange={(value) => handleAppearanceChange("theme", value)}
                 >
-                  <SelectTrigger id="theme">
+                  <SelectTrigger id="theme" className="border-slate-200 bg-white hover:border-blue-300 focus:border-blue-400 transition-colors">
                     <SelectValue placeholder="Sélectionnez un thème" />
                   </SelectTrigger>
                   <SelectContent>
@@ -228,13 +251,13 @@ export function SettingsForm() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="language">Langue</Label>
+              <div className="space-y-3">
+                <Label htmlFor="language" className="text-sm font-medium text-slate-700">Langue</Label>
                 <Select
                   value={settings.appearance.language}
                   onValueChange={(value) => handleAppearanceChange("language", value)}
                 >
-                  <SelectTrigger id="language">
+                  <SelectTrigger id="language" className="border-slate-200 bg-white hover:border-blue-300 focus:border-blue-400 transition-colors">
                     <SelectValue placeholder="Sélectionnez une langue" />
                   </SelectTrigger>
                   <SelectContent>
@@ -245,13 +268,13 @@ export function SettingsForm() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="currency">Devise</Label>
+              <div className="space-y-3">
+                <Label htmlFor="currency" className="text-sm font-medium text-slate-700">Devise</Label>
                 <Select
                   value={settings.appearance.currency}
                   onValueChange={(value) => handleAppearanceChange("currency", value)}
                 >
-                  <SelectTrigger id="currency">
+                  <SelectTrigger id="currency" className="border-slate-200 bg-white hover:border-blue-300 focus:border-blue-400 transition-colors">
                     <SelectValue placeholder="Sélectionnez une devise" />
                   </SelectTrigger>
                   <SelectContent>
@@ -261,29 +284,12 @@ export function SettingsForm() {
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="date-format">Format de date</Label>
-                <Select
-                  value={settings.appearance.dateFormat}
-                  onValueChange={(value) => handleAppearanceChange("dateFormat", value)}
-                >
-                  <SelectTrigger id="date-format">
-                    <SelectValue placeholder="Sélectionnez un format de date" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dd/MM/yyyy">JJ/MM/AAAA</SelectItem>
-                    <SelectItem value="MM/dd/yyyy">MM/JJ/AAAA</SelectItem>
-                    <SelectItem value="yyyy-MM-dd">AAAA-MM-JJ</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="px-6 py-4 bg-slate-50 border-t border-slate-200">
             <Button
               onClick={handleSaveSettings}
-              className="ml-auto bg-pharma-primary hover:bg-pharma-primary/90"
+              className="ml-auto bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white shadow-sm"
               disabled={isLoading}
             >
               {isLoading ? (

@@ -1,16 +1,36 @@
 "use client"
 
 import { SettingsForm } from "@/components/auth/settings-form"
+import { Settings } from "lucide-react"
 
 export default function SettingsPage() {
   return (
-    <div className="flex-1 space-y-4 pt-6">
-      <div className="flex flex-col space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight text-pharma-primary">Paramètres</h2>
-        <p className="text-sm text-pharma-primary/70">Personnalisez vos préférences</p>
-      </div>
-      <div className="mx-auto max-w-2xl">
-        <SettingsForm />
+    <div className="container mx-auto p-4 md:p-6 max-w-7xl">
+      <div className="flex flex-col gap-6">
+        {/* Header with gradient background */}
+        <div className="bg-gradient-to-r from-teal-500 via-blue-500 to-indigo-500 rounded-2xl p-6 shadow-xl text-white mb-2 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-15 bg-center"></div>
+          <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full bg-white/10 blur-3xl animate-pulse"></div>
+          <div className="absolute -top-12 -left-12 w-36 h-36 rounded-full bg-blue-300/10 blur-3xl animate-pulse"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-200 via-white/20 to-cyan-200 opacity-30"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-x"></div>
+          
+          <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center relative z-10">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
+                <Settings className="h-7 w-7 text-white/90" />
+                Paramètres
+              </h1>
+              <p className="text-sm text-cyan-100 mt-1 flex items-center">
+                Personnalisez vos préférences et configurez votre application
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mx-auto w-full max-w-2xl">
+          <SettingsForm />
+        </div>
       </div>
     </div>
   )

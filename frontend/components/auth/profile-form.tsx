@@ -96,45 +96,76 @@ export function ProfileForm() {
 
   return (
     <Tabs defaultValue="profile" className="w-full">
-      <TabsList className="grid w-full max-w-md grid-cols-2">
-        <TabsTrigger value="profile">Informations</TabsTrigger>
-        <TabsTrigger value="password">Mot de passe</TabsTrigger>
+      <TabsList className="bg-white rounded-xl overflow-hidden border border-slate-100 p-1 shadow-sm mb-6">
+        <TabsTrigger 
+          value="profile" 
+          className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+        >
+          Informations
+        </TabsTrigger>
+        <TabsTrigger 
+          value="password" 
+          className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+        >
+          Mot de passe
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="profile">
-        <Card className="max-w-2xl mx-auto border-0 shadow-md">
-          <CardHeader>
-            <CardTitle>Informations du profil</CardTitle>
-            <CardDescription>
+        <Card className="max-w-2xl mx-auto border-none shadow-md rounded-xl overflow-hidden">
+          <CardHeader className="bg-white border-b border-slate-100 p-6">
+            <CardTitle className="text-xl font-bold text-slate-800">Informations du profil</CardTitle>
+            <CardDescription className="text-slate-500">
               Mettez à jour vos informations personnelles et les détails de votre pharmacie
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleProfileSubmit} className="space-y-4">
+          <CardContent className="p-6 space-y-6">
+            <form onSubmit={handleProfileSubmit} className="space-y-5">
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
               {success && (
-                <Alert className="bg-green-50 text-green-800 border-green-200">
+                <Alert className="bg-green-50 text-green-700 border border-green-100">
                   <AlertDescription>{success}</AlertDescription>
                 </Alert>
               )}
               <div className="space-y-2">
-                <Label htmlFor="name">Nom complet</Label>
-                <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
+                <Label htmlFor="name" className="text-sm font-medium text-slate-700">Nom complet</Label>
+                <Input 
+                  id="name" 
+                  name="name" 
+                  value={formData.name} 
+                  onChange={handleChange} 
+                  className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
+                  required 
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required />
+                <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email</Label>
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  value={formData.email} 
+                  onChange={handleChange} 
+                  className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
+                  required 
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="pharmacyName">Nom de la pharmacie</Label>
-                <Input id="pharmacyName" name="pharmacyName" value={formData.pharmacyName} onChange={handleChange} />
+                <Label htmlFor="pharmacyName" className="text-sm font-medium text-slate-700">Nom de la pharmacie</Label>
+                <Input 
+                  id="pharmacyName" 
+                  name="pharmacyName" 
+                  value={formData.pharmacyName} 
+                  onChange={handleChange} 
+                  className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
+                />
               </div>
               <Button
                 type="submit"
-                className="w-full bg-pharma-primary hover:bg-pharma-primary/90"
+                className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white shadow-sm"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -151,59 +182,64 @@ export function ProfileForm() {
         </Card>
       </TabsContent>
       <TabsContent value="password">
-        <Card className="max-w-2xl mx-auto border-0 shadow-md">
-          <CardHeader>
-            <CardTitle>Changer le mot de passe</CardTitle>
-            <CardDescription>Mettez à jour votre mot de passe pour sécuriser votre compte</CardDescription>
+        <Card className="max-w-2xl mx-auto border-none shadow-md rounded-xl overflow-hidden">
+          <CardHeader className="bg-white border-b border-slate-100 p-6">
+            <CardTitle className="text-xl font-bold text-slate-800">Changer le mot de passe</CardTitle>
+            <CardDescription className="text-slate-500">
+              Mettez à jour votre mot de passe pour sécuriser votre compte
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+          <CardContent className="p-6 space-y-6">
+            <form onSubmit={handlePasswordSubmit} className="space-y-5">
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
               {success && (
-                <Alert className="bg-green-50 text-green-800 border-green-200">
+                <Alert className="bg-green-50 text-green-700 border border-green-100">
                   <AlertDescription>{success}</AlertDescription>
                 </Alert>
               )}
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+                <Label htmlFor="currentPassword" className="text-sm font-medium text-slate-700">Mot de passe actuel</Label>
                 <Input
                   id="currentPassword"
                   name="currentPassword"
                   type="password"
                   value={formData.currentPassword}
                   onChange={handleChange}
+                  className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+                <Label htmlFor="newPassword" className="text-sm font-medium text-slate-700">Nouveau mot de passe</Label>
                 <Input
                   id="newPassword"
                   name="newPassword"
                   type="password"
                   value={formData.newPassword}
                   onChange={handleChange}
+                  className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le nouveau mot de passe</Label>
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">Confirmer le nouveau mot de passe</Label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
                   type="password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                   required
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full bg-pharma-primary hover:bg-pharma-primary/90"
+                className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white shadow-sm"
                 disabled={isLoading}
               >
                 {isLoading ? (
