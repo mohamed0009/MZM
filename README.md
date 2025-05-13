@@ -69,9 +69,7 @@ Le frontend sera accessible à l'adresse http://localhost:3000
 
 Pour un démarrage rapide, vous pouvez utiliser le script `connect-to-backend.bat` (Windows) qui configure et lance automatiquement le frontend avec les bonnes variables d'environnement.
 
-## Initialisation des données
 
-Vous pouvez initialiser la base de données avec des données de test en utilisant la page `/data-init` de l'application.
 
 ## Pages principales
 

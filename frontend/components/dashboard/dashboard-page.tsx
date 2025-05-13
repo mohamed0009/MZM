@@ -456,15 +456,9 @@ export function DashboardPage() {
                 className={activeTab.includes("clients") ? "bg-[#06b6d4] text-white" : "text-slate-600 dark:text-slate-200"} 
                 onClick={() => setActiveTab("clients")}>
                 Ventes & Clients
-              </Button>
+                      </Button>
               
-              {user?.role === 'pharmacist' && (
-                <Button variant={activeTab === "prescriptions" ? "default" : "ghost"} 
-                  className={activeTab === "prescriptions" ? "bg-[#06b6d4] text-white" : "text-slate-600 dark:text-slate-200"} 
-                  onClick={() => setActiveTab("prescriptions")}>
-                  Initialiser données
-                </Button>
-              )}
+
             </nav>
 
             {/* Search bar - Desktop */}
