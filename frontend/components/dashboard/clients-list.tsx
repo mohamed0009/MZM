@@ -180,138 +180,159 @@ export function ClientsList({ data = [] }: ClientsListProps) {
   }
 
   return (
-    <Card className="border-0 shadow-lg overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-pharma-primary/10 to-pharma-primary/5 border-b">
-        <div className="flex items-center justify-between">
+    <Card className="border-none shadow-md rounded-xl overflow-hidden">
+      <CardHeader className="bg-white border-b border-slate-100 p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <CardTitle>Gestion des Clients</CardTitle>
-            <CardDescription>Gérez les informations de vos clients et leur historique médical</CardDescription>
+            <CardTitle className="text-xl font-bold text-slate-800">Liste des Clients</CardTitle>
+            <CardDescription className="text-slate-500">
+              {filteredClients.length} client{filteredClients.length !== 1 ? "s" : ""} enregistré{filteredClients.length !== 1 ? "s" : ""}
+            </CardDescription>
           </div>
-          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-1 bg-pharma-primary hover:bg-pharma-primary/90">
-                <UserPlus className="h-4 w-4" />
-                Nouveau Client
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Ajouter un nouveau client</DialogTitle>
-                <DialogDescription>
-                  Entrez les informations du client. Cliquez sur enregistrer quand vous avez terminé.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Nom
-                  </Label>
-                  <Input
-                    id="name"
-                    className="col-span-3"
-                    value={newClient.name}
-                    onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    className="col-span-3"
-                    value={newClient.email}
-                    onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phone" className="text-right">
-                    Téléphone
-                  </Label>
-                  <Input
-                    id="phone"
-                    className="col-span-3"
-                    value={newClient.phone}
-                    onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="dob" className="text-right">
-                    Date de naissance
-                  </Label>
-                  <Input
-                    id="dob"
-                    type="date"
-                    className="col-span-3"
-                    value={newClient.birthDate}
-                    onChange={(e) => setNewClient({ ...newClient, birthDate: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="prescription" className="text-right">
-                    Ordonnance
-                  </Label>
-                  <div className="col-span-3 flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="prescription"
-                      className="h-4 w-4 rounded border-gray-300 text-pharma-primary focus:ring-pharma-primary"
-                      checked={newClient.hasPrescription}
-                      onChange={(e) => setNewClient({ ...newClient, hasPrescription: e.target.checked })}
-                    />
-                    <Label htmlFor="prescription" className="text-sm font-normal">
-                      Le client a une ordonnance
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Rechercher un client..."
+                className="pl-8 w-full sm:w-[280px] bg-white border-slate-200 rounded-lg focus:border-blue-300 focus:ring-blue-200"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white shadow-sm font-medium">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Nouveau Client
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader className="bg-gradient-to-r from-teal-500 via-blue-500 to-indigo-500 p-6 rounded-t-xl text-white relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-15 bg-center"></div>
+                  <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-white/10 blur-3xl animate-pulse"></div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-200 via-white/20 to-cyan-200 opacity-30"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-x"></div>
+                  
+                  <DialogTitle className="text-xl font-bold text-white">Ajouter un nouveau client</DialogTitle>
+                  <DialogDescription className="text-cyan-100 mt-1">
+                    Entrez les informations du client. Cliquez sur enregistrer quand vous avez terminé.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-5 px-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium text-slate-700">
+                      Nom
                     </Label>
+                    <Input
+                      id="name"
+                      className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
+                      value={newClient.name}
+                      onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
+                      value={newClient.email}
+                      onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-medium text-slate-700">
+                      Téléphone
+                    </Label>
+                    <Input
+                      id="phone"
+                      className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
+                      value={newClient.phone}
+                      onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="dob" className="text-sm font-medium text-slate-700">
+                      Date de naissance
+                    </Label>
+                    <Input
+                      id="dob"
+                      type="date"
+                      className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
+                      value={newClient.birthDate}
+                      onChange={(e) => setNewClient({ ...newClient, birthDate: e.target.value })}
+                    />
                   </div>
                 </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setOpenDialog(false)}>
-                  Annuler
-                </Button>
-                <Button type="submit" onClick={handleAddClient}>
-                  Enregistrer
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter className="gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200 rounded-b-xl flex">
+                  <Button
+                    variant="outline"
+                    onClick={() => setOpenDialog(false)}
+                    className="border-slate-200 hover:bg-slate-100 transition-colors"
+                  >
+                    Annuler
+                  </Button>
+                  <Button 
+                    onClick={handleAddClient}
+                    className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white"
+                  >
+                    Enregistrer
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-        <CardDescription>Gérez les informations de vos clients et leur historique médical</CardDescription>
-      </CardHeader>
-      <CardContent className="p-6">
         {success && (
-          <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
+          <Alert className="mt-4 bg-green-50 text-green-700 border border-green-100">
             <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
-
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <select
-              className="h-10 w-[180px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="all">Tous les statuts</option>
-              <option value="régulier">Régulier</option>
-              <option value="occasionnel">Occasionnel</option>
-              <option value="nouveau">Nouveau</option>
-            </select>
-          </div>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+          <Tabs defaultValue="all" onValueChange={(value) => setStatusFilter(value)} className="w-full">
+            <TabsList className="bg-white rounded-xl overflow-hidden border border-slate-100 p-1 shadow-sm">
+              <TabsTrigger 
+                value="all" 
+                className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2 transition-all"
+              >
+                Tous
+              </TabsTrigger>
+              <TabsTrigger 
+                value="actif" 
+                className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2 transition-all"
+              >
+                Actifs
+              </TabsTrigger>
+              <TabsTrigger 
+                value="inactif" 
+                className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2 transition-all"
+              >
+                Inactifs
+              </TabsTrigger>
+              <TabsTrigger 
+                value="nouveau" 
+                className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2 transition-all"
+              >
+                Nouveaux
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
-
         <div className="rounded-md border overflow-hidden shadow-sm">
           <Table>
-            <TableHeader className="bg-gray-50">
-              <TableRow>
-                <TableHead className="w-[80px] font-semibold">Client</TableHead>
-                <TableHead className="font-semibold">Nom</TableHead>
-                <TableHead className="font-semibold">Contact</TableHead>
-                <TableHead className="font-semibold">Dernière visite</TableHead>
-                <TableHead className="font-semibold">Statut</TableHead>
-                <TableHead className="text-right font-semibold">Actions</TableHead>
+            <TableHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50">
+              <TableRow className="hover:bg-blue-50/70 border-b border-blue-200/50">
+                <TableHead className="font-medium w-[80px]">Avatar</TableHead>
+                <TableHead className="font-medium">Nom</TableHead>
+                <TableHead className="font-medium">Email</TableHead>
+                <TableHead className="font-medium">Téléphone</TableHead>
+                <TableHead className="font-medium">Statut</TableHead>
+                <TableHead className="font-medium">Dernière visite</TableHead>
+                <TableHead className="font-medium text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -425,81 +446,83 @@ export function ClientsList({ data = [] }: ClientsListProps) {
       {/* Dialogue de modification */}
       <Dialog open={editDialog} onOpenChange={setEditDialog}>
         <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Modifier le client</DialogTitle>
-            <DialogDescription>Modifiez les informations du client.</DialogDescription>
+          <DialogHeader className="bg-white p-6 border-b border-slate-100">
+            <DialogTitle className="text-xl font-bold">Modifier le client</DialogTitle>
+            <DialogDescription className="text-slate-500 mt-1">
+              Modifiez les informations du client.
+            </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-name" className="text-right">
+          <div className="grid gap-5 py-5 px-6 max-h-[60vh] overflow-y-auto">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name" className="text-sm font-medium text-slate-700">
                 Nom
               </Label>
               <Input
                 id="edit-name"
-                className="col-span-3"
+                className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                 value={editClient.name}
                 onChange={(e) => setEditClient({ ...editClient, name: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-email" className="text-right">
+            <div className="space-y-2">
+              <Label htmlFor="edit-email" className="text-sm font-medium text-slate-700">
                 Email
               </Label>
               <Input
                 id="edit-email"
                 type="email"
-                className="col-span-3"
+                className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                 value={editClient.email}
                 onChange={(e) => setEditClient({ ...editClient, email: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-phone" className="text-right">
+            <div className="space-y-2">
+              <Label htmlFor="edit-phone" className="text-sm font-medium text-slate-700">
                 Téléphone
               </Label>
               <Input
                 id="edit-phone"
-                className="col-span-3"
+                className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                 value={editClient.phone}
                 onChange={(e) => setEditClient({ ...editClient, phone: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-dob" className="text-right">
+            <div className="space-y-2">
+              <Label htmlFor="edit-dob" className="text-sm font-medium text-slate-700">
                 Date de naissance
               </Label>
               <Input
                 id="edit-dob"
                 type="date"
-                className="col-span-3"
+                className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                 value={editClient.birthDate}
                 onChange={(e) => setEditClient({ ...editClient, birthDate: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-status" className="text-right">
+            <div className="space-y-2">
+              <Label htmlFor="edit-status" className="text-sm font-medium text-slate-700">
                 Statut
               </Label>
               <select
                 id="edit-status"
-                className="col-span-3 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:border-blue-300 focus:outline-none"
                 value={editClient.status}
                 onChange={(e) => setEditClient({ ...editClient, status: e.target.value })}
               >
+                <option value="nouveau">Nouveau</option>
                 <option value="régulier">Régulier</option>
                 <option value="occasionnel">Occasionnel</option>
-                <option value="nouveau">Nouveau</option>
               </select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-prescription" className="text-right">
+            <div className="space-y-2">
+              <Label htmlFor="edit-prescription" className="text-sm font-medium text-slate-700">
                 Ordonnance
               </Label>
-              <div className="col-span-3 flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   id="edit-prescription"
-                  className="h-4 w-4 rounded border-gray-300 text-pharma-primary focus:ring-pharma-primary"
+                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   checked={editClient.hasPrescription}
                   onChange={(e) => setEditClient({ ...editClient, hasPrescription: e.target.checked })}
                 />
@@ -509,13 +532,22 @@ export function ClientsList({ data = [] }: ClientsListProps) {
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialog(false)}>
-              Annuler
-            </Button>
-            <Button type="submit" onClick={handleEditClient}>
-              Enregistrer les modifications
-            </Button>
+          <DialogFooter className="gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200 rounded-b-xl flex">
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <Button
+                variant="outline"
+                onClick={() => setEditDialog(false)}
+                className="border-slate-200 hover:bg-slate-100 transition-colors"
+              >
+                Annuler
+              </Button>
+              <Button 
+                onClick={handleEditClient}
+                className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white"
+              >
+                Enregistrer les modifications
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -542,118 +574,138 @@ export function ClientsList({ data = [] }: ClientsListProps) {
       {/* Dialogue de visualisation */}
       <Dialog open={viewDialog} onOpenChange={setViewDialog}>
         <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Profil du client</DialogTitle>
-            <DialogDescription>Informations détaillées sur le client.</DialogDescription>
+          <DialogHeader className="bg-white p-6 border-b border-slate-100">
+            <DialogTitle className="text-xl font-bold">Profil du client</DialogTitle>
+            <DialogDescription className="text-slate-500 mt-1">
+              Informations détaillées sur le client.
+            </DialogDescription>
           </DialogHeader>
           {selectedClient && (
-            <Tabs defaultValue="info" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="info">Informations</TabsTrigger>
-                <TabsTrigger value="history">Historique</TabsTrigger>
-                <TabsTrigger value="prescriptions">Ordonnances</TabsTrigger>
-              </TabsList>
-              <TabsContent value="info" className="space-y-4 py-4">
-                <div className="flex items-center gap-4 mb-4">
-                  <Avatar className="h-16 w-16 border-2 border-gray-200">
-                    <AvatarImage src={selectedClient.avatar || "/placeholder.svg"} alt={selectedClient.name} />
-                    <AvatarFallback className="text-xl bg-pharma-primary/10 text-pharma-primary font-semibold">
-                      {getInitials(selectedClient.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="text-lg font-semibold">{selectedClient.name}</h3>
-                    <p className="text-sm text-gray-500">Client depuis {formatDate(selectedClient.lastVisit)}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500">Email</h4>
-                    <p>{selectedClient.email}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500">Téléphone</h4>
-                    <p>{selectedClient.phone}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500">Date de naissance</h4>
-                    <p>{formatDate(selectedClient.birthDate)}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500">Statut</h4>
-                    <Badge
-                      variant="outline"
-                      className={
-                        selectedClient.status === "régulier"
-                          ? "bg-green-50 text-green-700 border-green-200"
-                          : selectedClient.status === "nouveau"
-                            ? "bg-blue-50 text-blue-700 border-blue-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200"
-                      }
-                    >
-                      {selectedClient.status}
-                    </Badge>
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="history" className="space-y-4 py-4">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Historique des visites</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between p-3 bg-gray-50 rounded-md">
-                      <div>
-                        <p className="font-medium">Consultation régulière</p>
-                        <p className="text-sm text-gray-500">Prise de tension, vérification traitement</p>
-                      </div>
-                      <p className="text-sm text-gray-500">{formatDate(selectedClient.lastVisit)}</p>
-                    </div>
-                    <div className="flex justify-between p-3 bg-gray-50 rounded-md">
-                      <div>
-                        <p className="font-medium">Renouvellement ordonnance</p>
-                        <p className="text-sm text-gray-500">Médicaments pour hypertension</p>
-                      </div>
-                      <p className="text-sm text-gray-500">{formatDate(new Date(2024, 2, 15))}</p>
-                    </div>
-                    <div className="flex justify-between p-3 bg-gray-50 rounded-md">
-                      <div>
-                        <p className="font-medium">Première visite</p>
-                        <p className="text-sm text-gray-500">Création du dossier client</p>
-                      </div>
-                      <p className="text-sm text-gray-500">{formatDate(new Date(2024, 1, 10))}</p>
+            <div className="max-h-[60vh] overflow-y-auto">
+              <Tabs defaultValue="info" className="w-full">
+                <TabsList className="bg-white rounded-xl overflow-hidden border border-slate-100 p-1 shadow-sm mx-6 mt-4">
+                  <TabsTrigger 
+                    value="info" 
+                    className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+                  >
+                    Informations
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="history" 
+                    className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+                  >
+                    Historique
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="prescriptions" 
+                    className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+                  >
+                    Ordonnances
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="info" className="space-y-6 px-6 py-4">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-20 w-20 bg-teal-50 text-teal-600 ring-1 ring-teal-200">
+                      <AvatarFallback className="text-xl bg-teal-50 text-teal-600 font-semibold">
+                        {getInitials(selectedClient.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="text-xl font-semibold text-slate-800">{selectedClient.name}</h3>
+                      <p className="text-sm text-slate-500">Client depuis {formatDate(selectedClient.lastVisit)}</p>
                     </div>
                   </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="prescriptions" className="space-y-4 py-4">
-                {selectedClient.hasPrescription ? (
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-500 mb-1">Email</h4>
+                      <p className="text-slate-800">{selectedClient.email}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-500 mb-1">Téléphone</h4>
+                      <p className="text-slate-800">{selectedClient.phone}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-500 mb-1">Date de naissance</h4>
+                      <p className="text-slate-800">{formatDate(selectedClient.birthDate)}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-500 mb-1">Statut</h4>
+                      <Badge
+                        variant="outline"
+                        className={
+                          selectedClient.status === "régulier"
+                            ? "bg-green-50 text-green-700 border-green-200"
+                            : selectedClient.status === "nouveau"
+                              ? "bg-blue-50 text-blue-700 border-blue-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                        }
+                      >
+                        {selectedClient.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </TabsContent>
+                <TabsContent value="history" className="space-y-4 px-6 py-4">
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Ordonnances actives</h3>
+                    <h3 className="text-lg font-semibold">Historique des visites</h3>
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                        <div className="flex items-center gap-3">
-                          <FileText className="h-5 w-5 text-blue-600" />
-                          <div>
-                            <p className="font-medium">Ordonnance Dr. Benjelloun</p>
-                            <p className="text-sm text-gray-500">Expire le {formatDate(new Date(2024, 5, 15))}</p>
-                          </div>
+                      <div className="flex justify-between p-3 bg-slate-50 rounded-md border border-slate-100">
+                        <div>
+                          <p className="font-medium">Consultation régulière</p>
+                          <p className="text-sm text-slate-500">Prise de tension, vérification traitement</p>
                         </div>
-                        <Button variant="outline" size="sm">
-                          Voir
-                        </Button>
+                        <p className="text-sm text-slate-500">{formatDate(selectedClient.lastVisit)}</p>
+                      </div>
+                      <div className="flex justify-between p-3 bg-slate-50 rounded-md border border-slate-100">
+                        <div>
+                          <p className="font-medium">Renouvellement ordonnance</p>
+                          <p className="text-sm text-slate-500">Médicaments pour hypertension</p>
+                        </div>
+                        <p className="text-sm text-slate-500">{formatDate(new Date(2024, 2, 15))}</p>
+                      </div>
+                      <div className="flex justify-between p-3 bg-slate-50 rounded-md border border-slate-100">
+                        <div>
+                          <p className="font-medium">Première visite</p>
+                          <p className="text-sm text-slate-500">Création du dossier client</p>
+                        </div>
+                        <p className="text-sm text-slate-500">{formatDate(new Date(2024, 1, 10))}</p>
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <FileText className="h-12 w-12 text-gray-300" />
-                    <p className="mt-2 text-gray-500">Aucune ordonnance active</p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
+                </TabsContent>
+                <TabsContent value="prescriptions" className="space-y-4 px-6 py-4">
+                  {selectedClient.hasPrescription ? (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Ordonnances actives</h3>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-md border border-slate-100">
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-5 w-5 text-blue-600" />
+                            <div>
+                              <p className="font-medium">Ordonnance Dr. Benjelloun</p>
+                              <p className="text-sm text-slate-500">Expire le {formatDate(new Date(2024, 5, 15))}</p>
+                            </div>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Voir
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <FileText className="h-12 w-12 text-slate-300" />
+                      <p className="mt-2 text-slate-500">Aucune ordonnance active</p>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
           )}
-          <DialogFooter>
-            <Button onClick={() => setViewDialog(false)}>Fermer</Button>
+          <DialogFooter className="px-6 py-4 bg-slate-50 border-t border-slate-200 rounded-b-xl">
+            <Button onClick={() => setViewDialog(false)} className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white">
+              Fermer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

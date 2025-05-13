@@ -169,99 +169,135 @@ export default function SalesPage() {
              (client && client.name.toLowerCase().includes(query)) ||
              sale.paymentMethod.toLowerCase().includes(query)
     })
-
+  
   return (
-    <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-6">Gestion des Ventes</h1>
-      
-      {/* Statistiques */}
-      <div className="grid gap-4 md:grid-cols-4 mb-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total des Ventes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {statsData?.totalSales ? formatMoney(statsData.totalSales) : "0 DH"}
+    <div className="container mx-auto p-4 md:p-6 max-w-7xl">
+      <div className="flex flex-col gap-6">
+        {/* Header with gradient background */}
+        <div className="bg-gradient-to-r from-teal-500 via-blue-500 to-indigo-500 rounded-2xl p-6 shadow-xl text-white mb-2 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-15 bg-center"></div>
+          <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full bg-white/10 blur-3xl animate-pulse"></div>
+          <div className="absolute -top-12 -left-12 w-36 h-36 rounded-full bg-blue-300/10 blur-3xl animate-pulse"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-200 via-white/20 to-cyan-200 opacity-30"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-x"></div>
+          
+          <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center relative z-10">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
+                <TrendingUp className="h-7 w-7 text-white/90" />
+                Gestion des Ventes
+              </h1>
+              <p className="text-sm text-cyan-100 mt-1 flex items-center">
+                Suivez vos transactions et analysez vos performances commerciales
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {statsData?.salesCount || 0} transactions
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Ventes Aujourd'hui
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {statsData?.todaySales ? formatMoney(statsData.todaySales) : "0 DH"}
             </div>
-            <p className="text-xs text-muted-foreground">
-              {statsData?.todaySalesCount || 0} transactions
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Vente Moyenne
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {statsData?.averageSale ? formatMoney(statsData.averageSale) : "0 DH"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              par transaction
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Méthode de Paiement
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {statsData?.mainPaymentMethod || "Espèces"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {statsData?.mainPaymentMethodPercentage || 0}% des transactions
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+
+        {/* Statistiques */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="group">
+            <Card className="bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-xl border-none overflow-hidden h-full border-l-4 border-l-blue-500">
+              <CardContent className="p-5 pt-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-full w-12 h-12 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-300 border border-blue-200/50">
+                  <TrendingUp className="h-6 w-6 text-blue-600" />
+                </div>
+                <CardTitle className="text-sm font-medium text-slate-500 mb-1">Total des Ventes</CardTitle>
+                <div className="text-2xl font-bold text-blue-700">{statsData?.totalSales ? formatMoney(statsData.totalSales) : "0 DH"}</div>
+                <p className="text-xs text-slate-500 mt-1">{statsData?.salesCount || 0} transactions</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="group">
+            <Card className="bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-xl border-none overflow-hidden h-full border-l-4 border-l-teal-500">
+              <CardContent className="p-5 pt-4">
+                <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-full w-12 h-12 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-300 border border-teal-200/50">
+                  <Calendar className="h-6 w-6 text-teal-600" />
+                </div>
+                <CardTitle className="text-sm font-medium text-slate-500 mb-1">Ventes Aujourd'hui</CardTitle>
+                <div className="text-2xl font-bold text-teal-700">{statsData?.todaySales ? formatMoney(statsData.todaySales) : "0 DH"}</div>
+                <p className="text-xs text-slate-500 mt-1">{statsData?.todaySalesCount || 0} transactions</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="group">
+            <Card className="bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-xl border-none overflow-hidden h-full border-l-4 border-l-indigo-500">
+              <CardContent className="p-5 pt-4">
+                <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-300 border border-indigo-200/50">
+                  <FileText className="h-6 w-6 text-indigo-600" />
+                </div>
+                <CardTitle className="text-sm font-medium text-slate-500 mb-1">Vente Moyenne</CardTitle>
+                <div className="text-2xl font-bold text-indigo-700">{statsData?.averageSale ? formatMoney(statsData.averageSale) : "0 DH"}</div>
+                <p className="text-xs text-slate-500 mt-1">par transaction</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="group">
+            <Card className="bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-xl border-none overflow-hidden h-full border-l-4 border-l-emerald-500">
+              <CardContent className="p-5 pt-4">
+                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-full w-12 h-12 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-300 border border-emerald-200/50">
+                  <Plus className="h-6 w-6 text-emerald-600" />
+                </div>
+                <CardTitle className="text-sm font-medium text-slate-500 mb-1">Méthode de Paiement</CardTitle>
+                <div className="text-2xl font-bold text-emerald-700">{statsData?.mainPaymentMethod || "Espèces"}</div>
+                <p className="text-xs text-slate-500 mt-1">{statsData?.mainPaymentMethodPercentage || 0}% des transactions</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       
       {/* Filtres et Recherche */}
-      <div className="flex flex-col md:flex-row justify-between mb-6 gap-4">
+      <div className="flex flex-col md:flex-row justify-between mb-6 gap-4 bg-white p-4 rounded-xl shadow-sm">
         <div className="flex gap-4">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input
-              placeholder="Rechercher..."
-              className="pl-8"
+              placeholder="Rechercher une vente..."
+              className="pl-8 bg-white border-slate-200 focus:border-blue-300 focus:ring-blue-200 rounded-lg"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           
-          <Select value={periodFilter} onValueChange={setPeriodFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Période" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes les périodes</SelectItem>
-              <SelectItem value="today">Aujourd'hui</SelectItem>
-              <SelectItem value="week">Cette semaine</SelectItem>
-              <SelectItem value="month">Ce mois</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="relative">
+            <Select value={periodFilter} onValueChange={setPeriodFilter}>
+              <SelectTrigger className="w-[180px] border-slate-200 bg-white hover:bg-slate-50 rounded-lg pl-3 pr-2">
+                <div className="flex items-center">
+                  <Calendar className="h-4 w-4 mr-2 text-slate-500" />
+                  <SelectValue placeholder="Toutes les périodes" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-white rounded-lg border-slate-200 shadow-md">
+                <SelectItem value="all" className="py-2.5 pl-8 relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2">
+                    {periodFilter === "all" && <div className="h-4 w-4 rounded-full text-blue-600 flex items-center justify-center">✓</div>}
+                  </span>
+                  Toutes les périodes
+                </SelectItem>
+                <SelectItem value="today" className="py-2.5 pl-8 relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2">
+                    {periodFilter === "today" && <div className="h-4 w-4 rounded-full text-blue-600 flex items-center justify-center">✓</div>}
+                  </span>
+                  Aujourd'hui
+                </SelectItem>
+                <SelectItem value="week" className="py-2.5 pl-8 relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2">
+                    {periodFilter === "week" && <div className="h-4 w-4 rounded-full text-blue-600 flex items-center justify-center">✓</div>}
+                  </span>
+                  Cette semaine
+                </SelectItem>
+                <SelectItem value="month" className="py-2.5 pl-8 relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2">
+                    {periodFilter === "month" && <div className="h-4 w-4 rounded-full text-blue-600 flex items-center justify-center">✓</div>}
+                  </span>
+                  Ce mois
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         
         <Dialog 
@@ -269,27 +305,35 @@ export default function SalesPage() {
           onOpenChange={(open) => setDialog({ ...dialog, isOpen: open })}
         >
           <DialogTrigger asChild>
-            <Button onClick={() => setDialog({ isOpen: true, isSaving: false, mode: "create" })}>
+            <Button 
+              className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white shadow-sm"
+              onClick={() => setDialog({ isOpen: true, isSaving: false, mode: "create" })}
+            >
               <Plus className="mr-2 h-4 w-4" /> Nouvelle Vente
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[700px]">
-            <DialogHeader>
-              <DialogTitle>Enregistrer une Vente</DialogTitle>
-              <DialogDescription>
+            <DialogHeader className="bg-gradient-to-r from-teal-500 via-blue-500 to-indigo-500 p-6 rounded-t-xl text-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-15 bg-center"></div>
+              <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-white/10 blur-3xl animate-pulse"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-200 via-white/20 to-cyan-200 opacity-30"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-x"></div>
+              
+              <DialogTitle className="text-2xl font-bold text-white">Enregistrer une Vente</DialogTitle>
+              <DialogDescription className="text-cyan-100 mt-1">
                 Remplissez les informations de la vente ci-dessous.
               </DialogDescription>
             </DialogHeader>
             
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-5 py-5 px-6 max-h-[60vh] overflow-y-auto">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="client">Client</Label>
+                  <Label htmlFor="client" className="text-sm font-medium text-slate-700">Client</Label>
                   <Select 
                     value={newSale.clientId} 
                     onValueChange={(value) => setNewSale({ ...newSale, clientId: value })}
                   >
-                    <SelectTrigger id="client">
+                    <SelectTrigger id="client" className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors">
                       <SelectValue placeholder="Sélectionner un client" />
                     </SelectTrigger>
                     <SelectContent>
@@ -303,81 +347,87 @@ export default function SalesPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="date">Date</Label>
+                  <Label htmlFor="date" className="text-sm font-medium text-slate-700">Date</Label>
                   <Input
                     id="date"
                     type="date"
                     value={newSale.saleDate}
                     onChange={(e) => setNewSale({ ...newSale, saleDate: e.target.value })}
+                    className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                   />
                 </div>
               </div>
               
-              <div>
-                <Label className="mb-2 block">Produits</Label>
-                {newSale.items.map((item: any, index: number) => (
-                  <div key={index} className="grid grid-cols-[3fr,1fr,2fr,auto] gap-2 mb-2">
-                    <Select 
-                      value={item.productId} 
-                      onValueChange={(value) => handleItemChange(index, 'productId', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Produit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {products.map((product) => (
-                          <SelectItem key={product.id} value={product.id}>
-                            {product.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    
-                    <Input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
-                      placeholder="Qté"
-                    />
-                    
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.price}
-                      onChange={(e) => handleItemChange(index, 'price', parseFloat(e.target.value))}
-                      placeholder="Prix"
-                    />
-                    
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => handleRemoveItem(index)}
-                      disabled={newSale.items.length === 1}
-                    >
-                      &times;
-                    </Button>
-                  </div>
-                ))}
+            <div>
+                <Label className="mb-3 block text-sm font-medium text-slate-700">Produits</Label>
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 mb-4">
+                  {newSale.items.map((item: any, index: number) => (
+                    <div key={index} className="grid grid-cols-[3fr,1fr,2fr,auto] gap-3 mb-3 last:mb-0">
+                      <Select 
+                        value={item.productId} 
+                        onValueChange={(value) => handleItemChange(index, 'productId', value)}
+                      >
+                        <SelectTrigger className="border-slate-200 bg-white hover:border-blue-300 focus:border-blue-400 transition-colors">
+                          <SelectValue placeholder="Produit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {products.map((product) => (
+                            <SelectItem key={product.id} value={product.id}>
+                              {product.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <Input
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                        placeholder="Qté"
+                        className="border-slate-200 bg-white hover:border-blue-300 focus:border-blue-400 transition-colors"
+                      />
+                      
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.price}
+                        onChange={(e) => handleItemChange(index, 'price', parseFloat(e.target.value))}
+                        placeholder="Prix"
+                        className="border-slate-200 bg-white hover:border-blue-300 focus:border-blue-400 transition-colors"
+                      />
+                      
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={() => handleRemoveItem(index)}
+                        disabled={newSale.items.length === 1}
+                        className="border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                      >
+                        &times;
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  <Button variant="outline" onClick={handleAddItem} className="mt-3 w-full bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors">
+                    + Ajouter un produit
+                  </Button>
+                </div>
                 
-                <Button variant="outline" onClick={handleAddItem} className="mt-2 w-full">
-                  + Ajouter un produit
-                </Button>
-                
-                <div className="text-right mt-4 font-bold">
+                <div className="text-right mt-4 font-bold text-blue-700 bg-blue-50 p-3 rounded-lg border border-blue-100">
                   Total: {formatMoney(calculateTotal())}
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="paymentMethod">Méthode de Paiement</Label>
+                  <Label htmlFor="paymentMethod" className="text-sm font-medium text-slate-700">Méthode de Paiement</Label>
                   <Select 
                     value={newSale.paymentMethod} 
                     onValueChange={(value) => setNewSale({ ...newSale, paymentMethod: value })}
                   >
-                    <SelectTrigger id="paymentMethod">
+                    <SelectTrigger id="paymentMethod" className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors">
                       <SelectValue placeholder="Méthode de paiement" />
                     </SelectTrigger>
                     <SelectContent>
@@ -390,130 +440,174 @@ export default function SalesPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="notes">Notes</Label>
+                  <Label htmlFor="notes" className="text-sm font-medium text-slate-700">Notes</Label>
                   <Input
                     id="notes"
                     value={newSale.notes}
                     onChange={(e) => setNewSale({ ...newSale, notes: e.target.value })}
                     placeholder="Notes additionnelles"
+                    className="border-slate-200 hover:border-blue-300 focus:border-blue-400 transition-colors"
                   />
                 </div>
               </div>
             </div>
-            
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setDialog({ ...dialog, isOpen: false })}>
-                Annuler
-              </Button>
-              <Button onClick={handleSaveSale} disabled={dialog.isSaving}>
-                {dialog.isSaving ? "Enregistrement..." : "Enregistrer"}
-              </Button>
+
+            <DialogFooter className="gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200 rounded-b-xl flex">
+              <div className="grid grid-cols-3 gap-3 w-full">
+                <Button variant="outline" onClick={() => setDialog({ ...dialog, isOpen: false })} className="border-slate-200 hover:bg-slate-100 transition-colors col-span-1">
+                  Annuler
+                </Button>
+                <Button 
+                  onClick={handleSaveSale} 
+                  disabled={dialog.isSaving}
+                  className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white col-span-2"
+                >
+                  {dialog.isSaving ? "Enregistrement..." : "Enregistrer"}
+                </Button>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
-      
+            </div>
+
       {/* Onglets */}
-      <Tabs defaultValue="list">
-        <TabsList className="mb-4">
-          <TabsTrigger value="list">
+      <Tabs defaultValue="list" className="mt-2">
+        <TabsList className="mb-4 bg-white rounded-xl overflow-hidden border border-slate-100 p-1 shadow-sm">
+          <TabsTrigger 
+            value="list" 
+            className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+          >
             <FileText className="h-4 w-4 mr-2" />
             Liste des Ventes
           </TabsTrigger>
-          <TabsTrigger value="stats">
+          <TabsTrigger 
+            value="stats" 
+            className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm px-6 py-2.5 transition-all"
+          >
             <TrendingUp className="h-4 w-4 mr-2" />
             Statistiques
           </TabsTrigger>
         </TabsList>
         
         <TabsContent value="list">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Paiement</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+          <Card className="border-slate-200 shadow-md rounded-xl border-none overflow-hidden">
+                <CardContent className="p-0">
+                    <Table>
+                <TableHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50">
+                  <TableRow className="hover:bg-blue-50/70 border-b border-blue-200/50">
+                    <TableHead className="font-medium">ID</TableHead>
+                    <TableHead className="font-medium">Client</TableHead>
+                    <TableHead className="font-medium">Date</TableHead>
+                    <TableHead className="font-medium">Total</TableHead>
+                    <TableHead className="font-medium">Paiement</TableHead>
+                    <TableHead className="text-right font-medium">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center">Chargement des données...</TableCell>
+                      <TableCell colSpan={6} className="text-center py-8 text-slate-500">
+                        <div className="flex items-center justify-center">
+                          <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600 mr-2" />
+                          Chargement des données...
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ) : filteredSales.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center">Aucune vente trouvée</TableCell>
+                      <TableCell colSpan={6} className="text-center py-8 text-slate-500">
+                        Aucune vente trouvée
+                      </TableCell>
                     </TableRow>
                   ) : (
                     filteredSales.map((sale) => {
                       const client = clients.find(c => c.id === sale.clientId)
                       return (
-                        <TableRow key={sale.id}>
-                          <TableCell>{sale.id}</TableCell>
+                        <TableRow key={sale.id} className="hover:bg-blue-50/40 border-b border-slate-200 transition-colors">
+                          <TableCell className="font-medium text-blue-700">{sale.id}</TableCell>
                           <TableCell>{client?.name || "Client inconnu"}</TableCell>
                           <TableCell>{formatDate(sale.saleDate)}</TableCell>
-                          <TableCell>
+                          <TableCell className="font-medium">
                             {formatMoney(sale.items.reduce(
                               (total: number, item: any) => total + (item.quantity * item.price), 0
                             ))}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={sale.paymentMethod === "CASH" ? "default" : "outline"}>
+                            </TableCell>
+                            <TableCell>
+                            <Badge variant={sale.paymentMethod === "CASH" ? "default" : "outline"} 
+                              className={
+                                sale.paymentMethod === "CASH" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                                sale.paymentMethod === "CARD" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                                sale.paymentMethod === "TRANSFER" ? "bg-indigo-50 text-indigo-700 border-indigo-200" :
+                                "bg-amber-50 text-amber-700 border-amber-200"
+                              }>
                               {sale.paymentMethod === "CASH" ? "Espèces" : 
                                sale.paymentMethod === "CARD" ? "Carte" : 
                                sale.paymentMethod === "TRANSFER" ? "Virement" : "Mobile"}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Button variant="ghost" size="sm">
-                              Détails
-                            </Button>
-                          </TableCell>
-                        </TableRow>
+                            </TableCell>
+                            <TableCell className="text-right">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="h-8 w-8 rounded-full text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+                            >
+                              <FileText className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
                       )
                     })
                   )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                      </TableBody>
+                    </Table>
+                </CardContent>
+              </Card>
         </TabsContent>
         
         <TabsContent value="stats">
           <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Ventes par Période</CardTitle>
-                <CardDescription>
+            <Card className="border-none shadow-md rounded-xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50 border-b border-blue-100">
+                <CardTitle className="text-blue-800 flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                  Ventes par Période
+                </CardTitle>
+                <CardDescription className="text-blue-600">
                   Analyse des ventes sur les derniers mois
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6 bg-white">
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={statsData?.salesByPeriod || getMockStats().salesByPeriod}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="period" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => [`${value} DH`, 'Montant']} />
-                    <Bar dataKey="amount" fill="#8884d8" name="Montant" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f4f8" />
+                    <XAxis dataKey="period" tick={{fill: '#64748b'}} />
+                    <YAxis tick={{fill: '#64748b'}} />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      formatter={(value) => [`${value} DH`, 'Montant']}
+                    />
+                    <Bar dataKey="amount" fill="#3b82f6" name="Montant" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Répartition des Paiements</CardTitle>
-                <CardDescription>
+            <Card className="border-none shadow-md rounded-xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-indigo-100/50 border-b border-indigo-100">
+                <CardTitle className="text-indigo-800 flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-indigo-600" />
+                  Répartition des Paiements
+                </CardTitle>
+                <CardDescription className="text-indigo-600">
                   Par méthode de paiement
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6 bg-white">
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
@@ -530,47 +624,65 @@ export default function SalesPage() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [`${value} transactions`, 'Nombre']} />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      formatter={(value) => [`${value} transactions`, 'Nombre']} 
+                    />
                   </PieChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle>Produits les Plus Vendus</CardTitle>
-                <CardDescription>
+            <Card className="md:col-span-2 border-none shadow-md rounded-xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-teal-50 to-teal-100/50 border-b border-teal-100">
+                <CardTitle className="text-teal-800 flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-teal-600" />
+                  Produits les Plus Vendus
+                </CardTitle>
+                <CardDescription className="text-teal-600">
                   Top des produits par nombre de ventes
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0 bg-white">
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>#</TableHead>
-                      <TableHead>Produit</TableHead>
-                      <TableHead>Quantité Vendue</TableHead>
-                      <TableHead>Montant Total</TableHead>
-                      <TableHead>% du Total</TableHead>
+                  <TableHeader className="bg-gradient-to-r from-teal-50 to-teal-100/50">
+                    <TableRow className="hover:bg-teal-50/70 border-b border-teal-200/50">
+                      <TableHead className="font-medium">#</TableHead>
+                      <TableHead className="font-medium">Produit</TableHead>
+                      <TableHead className="font-medium text-right">Quantité</TableHead>
+                      <TableHead className="font-medium text-right">Montant Total</TableHead>
+                      <TableHead className="font-medium text-right">% du Total</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {(statsData?.topProducts || getMockStats().topProducts).map((product: any, index: number) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell className="font-medium">{product.name}</TableCell>
-                        <TableCell>{product.quantity}</TableCell>
-                        <TableCell>{formatMoney(product.total)}</TableCell>
-                        <TableCell>{product.percentage}%</TableCell>
+                      <TableRow key={index} className="hover:bg-teal-50/40 border-b border-slate-200 transition-colors">
+                        <TableCell className="text-slate-500 font-medium">{index + 1}</TableCell>
+                        <TableCell className="font-medium text-blue-700">{product.name}</TableCell>
+                        <TableCell className="text-right">{product.quantity}</TableCell>
+                        <TableCell className="text-right font-medium">{formatMoney(product.total)}</TableCell>
+                        <TableCell className="text-right">
+                          <Badge className="bg-teal-50 text-teal-700 border-teal-200">
+                            {product.percentage}%
+                          </Badge>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+                </CardContent>
+              </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      
+      <style jsx global>{styles}</style>
     </div>
   )
 }
@@ -661,4 +773,36 @@ function getMockStats() {
       { name: 'Doliprane 1000mg', quantity: 76, total: 3990, percentage: 8 }
     ]
   }
-} 
+}
+
+// Add animation styles
+const styles = `
+  @keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 15s ease infinite;
+  }
+  
+  @keyframes animate-delay-150 {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .animate-delay-150 {
+    animation-delay: 150ms;
+  }
+  
+  @keyframes animate-delay-300 {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .animate-delay-300 {
+    animation-delay: 300ms;
+  }
+`; 
