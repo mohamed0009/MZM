@@ -1,18 +1,45 @@
 package com.mzm.pharmaflow.repository;
 
 import com.mzm.pharmaflow.model.Client;
-import com.mzm.pharmaflow.model.ClientStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    Optional<Client> findByEmail(String email);
-    Optional<Client> findByPhone(String phone);
-    List<Client> findByStatus(ClientStatus status);
-    List<Client> findByLastNameContainingIgnoreCaseOrFirstNameContainingIgnoreCase(String lastName, String firstName);
-    Boolean existsByEmail(String email);
+    
+    /**
+     * Find clients by status
+     * @param status client status
+     * @return list of clients with the specified status
+     */
+    List<Client> findByStatus(String status);
+    
+    /**
+     * Search clients by name
+     * @param name name to search for
+     * @return list of matching clients
+     */
+    List<Client> findByNameContainingIgnoreCase(String name);
+    
+    /**
+     * Search clients by email
+     * @param email email to search for
+     * @return client with the email
+     */
+    Client findByEmail(String email);
+    
+    /**
+     * Search clients by phone
+     * @param phone phone number to search for
+     * @return client with the phone number
+     */
+    Client findByPhone(String phone);
+    
+    /**
+     * Find clients with prescription
+     * @return list of clients with prescription
+     */
+    List<Client> findByHasPrescriptionTrue();
 } 

@@ -29,17 +29,21 @@ public class DashboardController {
         response.put("stats", stats);
 
         // Sales Chart Data
-        List<Map<String, Object>> salesChart = new ArrayList<>();
+        Map<String, Object> salesChart = new HashMap<>();
+        List<String> labels = new ArrayList<>();
+        List<Integer> data = new ArrayList<>();
+        
         LocalDate now = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM");
         
         for (int i = 6; i >= 0; i--) {
-            Map<String, Object> dataPoint = new HashMap<>();
             LocalDate date = now.minusMonths(i);
-            dataPoint.put("date", date.format(formatter));
-            dataPoint.put("value", (int)(Math.random() * 1000) + 500);
-            salesChart.add(dataPoint);
+            labels.add(date.format(formatter));
+            data.add((int)(Math.random() * 1000) + 500);
         }
+        
+        salesChart.put("labels", labels);
+        salesChart.put("data", data);
         response.put("salesChart", salesChart);
 
         // Recent Sales
