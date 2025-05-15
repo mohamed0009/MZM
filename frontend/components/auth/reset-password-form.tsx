@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { HeartPulse, Loader2 } from "lucide-react"
+import { Heart, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -40,9 +40,30 @@ export function ResetPasswordForm() {
     <Card className="w-full max-w-md border-0 shadow-lg">
       <CardHeader className="space-y-2 text-center">
         <div className="flex justify-center">
-          <div className="relative">
-            <HeartPulse className="h-12 w-12 text-pharma-primary" />
-            <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-pharma-secondary"></div>
+          <div className="relative w-14 h-14">
+            <div className="absolute inset-0 bg-pharma-primary rounded-full animate-pulse opacity-60"></div>
+            <div className="relative flex items-center justify-center w-full h-full bg-pharma-primary rounded-full">
+              <Heart 
+                className="text-white" 
+                fill="white" 
+                size={28} 
+              />
+              <svg 
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" 
+                width={18} 
+                height={10} 
+                viewBox="0 0 16 8" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path 
+                  d="M0 4H3L4 1L6 7L8 4L9 5L11 2L13 4H16" 
+                  stroke="currentColor" 
+                  strokeWidth="1.5"
+                  className="heartbeat-line text-pharma-secondary"
+                />
+              </svg>
+            </div>
           </div>
         </div>
         <CardTitle className="text-2xl font-bold">Réinitialiser votre mot de passe</CardTitle>
@@ -68,7 +89,7 @@ export function ResetPasswordForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="exemple@mzm.ma"
+                placeholder="exemple@pharmaflow.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

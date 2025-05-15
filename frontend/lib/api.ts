@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosInstance } from 'axios';
 
-// Determine the API base URL based on environment
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
-console.log('API URL:', API_URL);
+// Use relative URL for API calls to work with Next.js rewrites/proxy
+const API_URL = '/api';
+console.log('Using API URL with proxy:', API_URL);
 
 // Create axios instance with default config
 const api = axios.create({
@@ -70,9 +70,24 @@ api.interceptors.response.use(
       }
     }
     
-    // Log API errors for debugging
+    // Enhanced error logging
     if (process.env.NODE_ENV !== 'production') {
       console.error('API Response Error:', error.message);
+      
+      // Log specific information about CORS errors
+      if (error.message === 'Network Error') {
+        console.error('CORS ERROR: This is likely a Cross-Origin Resource Sharing (CORS) issue.');
+        console.error('Check that your backend server is:');
+        console.error('1. Running and accessible');
+        console.error('2. Configured to accept requests from ' + window.location.origin);
+        console.error('3. Setting the correct Access-Control-Allow-Origin header');
+        console.error('---');
+        console.error('Request URL:', originalRequest?.url);
+        console.error('Origin:', window.location.origin);
+        console.error('---');
+        console.error('Using proxy via Next.js rewrites to avoid CORS.');
+      }
+      
       if (error.response) {
         console.error('Request URL:', originalRequest.url);
         console.error('Request Method:', originalRequest.method);

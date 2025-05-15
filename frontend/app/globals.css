@@ -145,3 +145,14 @@ html {
   background-size: 100% 40px, 100% 40px, 100% 15px, 100% 15px;
   background-attachment: local, local, scroll, scroll;
 }
+
+/* Heartbeat animation for PharmaFlow logo */
+.heartbeat-line {
+  stroke-dasharray: 24;
+  animation: heartbeat-pulse 1.5s infinite linear;
+}
+
+@keyframes heartbeat-pulse {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -48; }
+}

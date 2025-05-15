@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Image from "next/image"
 import { 
   Bell, 
@@ -38,6 +38,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { motion, AnimatePresence } from "framer-motion";
+import { SearchBox } from "@/components/shared/search-box";
 
 // Animated logo component with heartbeat effect
 const AnimatedLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
@@ -48,8 +49,8 @@ const AnimatedLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
   };
   
   return (
-    <div className={cn("relative rounded-full bg-teal-500 flex items-center justify-center", sizeClasses[size])}>
-      <div className="absolute inset-0 bg-teal-400 rounded-full animate-pulse opacity-60"></div>
+    <div className={cn("relative rounded-full bg-blue-600 flex items-center justify-center", sizeClasses[size])}>
+      <div className="absolute inset-0 bg-blue-500 rounded-full animate-pulse opacity-60"></div>
       <div className="relative">
         <Heart 
           className="text-white" 
@@ -66,7 +67,7 @@ const AnimatedLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
         >
           <path 
             d="M0 4H3L4 1L6 7L8 4L9 5L11 2L13 4H16" 
-            stroke="teal" 
+            stroke="blue" 
             strokeWidth="1.5"
             className="heartbeat-line"
           />
@@ -82,6 +83,7 @@ export function GlobalHeader() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
 
   const getInitials = (name: string): string => {
     return name
@@ -109,21 +111,21 @@ export function GlobalHeader() {
   }, [pathname])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-blue-100 bg-gradient-to-r from-white to-blue-50/30 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm relative overflow-hidden">
+    <header className="sticky top-0 z-50 w-full border-b border-blue-100 bg-gradient-to-r from-white to-blue-50/30 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm relative overflow-visible">
       <style jsx global>{`
-        @keyframes heartbeat {
-          0% { stroke-dashoffset: 24; }
-          100% { stroke-dashoffset: 0; }
-        }
-        
         .heartbeat-line {
           stroke-dasharray: 24;
-          animation: heartbeat 1.5s infinite linear;
+          animation: heartbeat-pulse 1.5s infinite linear;
+        }
+        
+        @keyframes heartbeat-pulse {
+          0% { stroke-dashoffset: 0; }
+          100% { stroke-dashoffset: -48; }
         }
       `}</style>
       <div className="absolute inset-0 bg-pharma-pattern opacity-[0.03]"></div>
       <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-blue-50/5 to-white/20 opacity-50"></div>
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6 relative z-10">
+      <div className="container flex h-16 items-center justify-between px-4 md:px-6 relative z-10" style={{ overflow: 'visible' }}>
         {/* Logo & Brand */}
         <div className="flex items-center gap-4">
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -386,27 +388,23 @@ export function GlobalHeader() {
         </div>
 
         {/* Search and User Controls */}
-        <div className="flex items-center gap-3">
-          {/* Expanded Search on Desktop */}
+        <div className="flex items-center gap-3" style={{ overflow: 'visible' }}>
+          {/* Use the SearchBox component for desktop */}
           <div className={cn(
             "hidden md:flex relative transition-all duration-300",
             isSearchFocused ? "w-[350px]" : "w-[280px]"
-          )}>
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                type="search"
-                placeholder="Rechercher médicaments, clients..."
-                className={cn(
-                  "pl-9 pr-4 w-full transition-all duration-300 rounded-full",
-                  isSearchFocused 
-                    ? "bg-white border-blue-200 shadow-sm focus-visible:ring-blue-200" 
-                    : "bg-slate-50 border-transparent hover:bg-white hover:border-blue-100"
-                )}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-              />
-            </div>
+          )} style={{ overflow: 'visible', zIndex: 50 }}>
+            <SearchBox 
+              placeholder="Rechercher médicaments, clients..." 
+              size="md"
+              maxWidth="w-full"
+              showTabs={true}
+              positionMode="fixed"
+              onResultClick={(result) => {
+                // Navigate to result page
+                router.push(result.link);
+              }}
+            />
           </div>
           
           {/* Mobile Search Trigger */}
@@ -521,15 +519,17 @@ export function GlobalHeader() {
             className="border-t border-blue-100 overflow-hidden md:hidden bg-white"
           >
             <div className="p-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input
-                  type="search"
-                  placeholder="Rechercher médicaments, clients..."
-                  className="pl-9 pr-4 w-full bg-white border-blue-200 focus-visible:ring-blue-200 rounded-full shadow-sm"
-                  autoFocus
-                />
-              </div>
+              <SearchBox 
+                placeholder="Rechercher médicaments, clients..." 
+                size="md"
+                maxWidth="w-full"
+                showTabs={true}
+                onResultClick={(result) => {
+                  // Navigate to result page
+                  router.push(result.link);
+                  setIsSearchOpen(false);
+                }}
+              />
             </div>
           </motion.div>
         )}

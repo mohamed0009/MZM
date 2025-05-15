@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Overview } from "@/components/dashboard/overview"
@@ -51,6 +51,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import { SearchBox } from "@/components/shared/search-box"
 
 interface DashboardData {
   stats: {
@@ -124,6 +125,12 @@ export function DashboardPage() {
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [searchResults, setSearchResults] = useState<{
+    medications: any[];
+    clients: any[];
+  } | null>(null)
+  const [isSearchResultsOpen, setIsSearchResultsOpen] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
 
   // Initialize dark mode from localStorage
   useEffect(() => {
@@ -217,39 +224,81 @@ export function DashboardPage() {
     fetchDashboardData()
   }, [user?.role])
 
-  const getRoleBasedTabs = () => {
-    const baseTabs = [
-      { value: "overview", label: "Aperçu", icon: "LayoutDashboard" },
-      { value: "alerts", label: "Alertes", icon: "Bell" },
-      { value: "inventory", label: "Inventaire", icon: "Pill" },
-      { value: "clients", label: "Clients", icon: "Users" },
-      { value: "calendar", label: "Calendrier", icon: "Calendar" }
-    ]
+  // Close search results when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchResultsOpen(false)
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    if (user?.role === 'admin') {
-      return [
-        ...baseTabs,
-        { value: "analytics", label: "Analytics", icon: "BarChart" },
-        { value: "settings", label: "Paramètres", icon: "Settings" }
-      ]
+  // Handle search query changes with debounce
+  useEffect(() => {
+    if (!searchQuery) {
+      setSearchResults(null);
+      setIsSearchResultsOpen(false);
+      return;
     }
 
-    if (user?.role === 'pharmacist') {
-      return [
-        ...baseTabs,
-        { value: "prescriptions", label: "Ordonnances", icon: "FileText" }
-      ]
-    }
+    const delayDebounceFn = setTimeout(() => {
+      performSearch(searchQuery);
+    }, 300);
 
-    return baseTabs
-  }
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const performSearch = async (query: string) => {
+    if (!query.trim()) return;
+    
+    try {
+      // You can replace this with actual API call
+      // const response = await api.get(`/search?query=${encodeURIComponent(query)}`);
+      // setSearchResults(response.data);
+
+      // Mock search results for demo
+      const mockResults = {
+        medications: [
+          { id: '1', name: 'Paracetamol 500mg', stock: 120, category: 'Analgésique' },
+          { id: '2', name: 'Amoxicilline 1g', stock: 85, category: 'Antibiotique' },
+          { id: '3', name: 'Doliprane 1000mg', stock: 65, category: 'Analgésique' },
+        ].filter(med => med.name.toLowerCase().includes(query.toLowerCase())),
+        clients: [
+          { id: '1', name: 'Mohammed Alami', phone: '0612345678', lastVisit: '2023-05-12' },
+          { id: '2', name: 'Fatima Benali', phone: '0698765432', lastVisit: '2023-05-18' },
+          { id: '3', name: 'Ahmed Laroussi', phone: '0661234567', lastVisit: '2023-05-15' },
+        ].filter(client => client.name.toLowerCase().includes(query.toLowerCase()))
+      };
+      
+      setSearchResults(mockResults);
+      setIsSearchResultsOpen(true);
+    } catch (error) {
+      console.error('Error performing search:', error);
+      setSearchResults(null);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      // Implémenter la logique de recherche ici
-      console.log("Recherche:", searchQuery)
+      performSearch(searchQuery)
     }
+  }
+
+  const handleSearchItemClick = (type: string, id: string) => {
+    // Handle navigation to the selected item
+    if (type === 'medication') {
+      setActiveTab("inventory")
+      // Additional logic to focus on the specific medication
+    } else if (type === 'client') {
+      setActiveTab("clients")
+      // Additional logic to focus on the specific client
+    }
+    
+    setIsSearchResultsOpen(false)
   }
 
   if (isLoading) {
@@ -341,11 +390,39 @@ export function DashboardPage() {
     )
   }
 
+  // Define the role-based tabs
+  const getRoleBasedTabs = () => {
+    const baseTabs = [
+      { value: "overview", label: "Aperçu", icon: "LayoutDashboard" },
+      { value: "alerts", label: "Alertes", icon: "Bell" },
+      { value: "inventory", label: "Inventaire", icon: "Pill" },
+      { value: "clients", label: "Clients", icon: "Users" },
+      { value: "calendar", label: "Calendrier", icon: "Calendar" }
+    ];
+
+    if (user?.role === 'admin') {
+      return [
+        ...baseTabs,
+        { value: "analytics", label: "Analytics", icon: "BarChart" },
+        { value: "settings", label: "Paramètres", icon: "Settings" }
+      ];
+    }
+
+    if (user?.role === 'pharmacist') {
+      return [
+        ...baseTabs,
+        { value: "prescriptions", label: "Ordonnances", icon: "FileText" }
+      ];
+    }
+
+    return baseTabs;
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-900 transition-colors duration-200">
-      <header className="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-200">
-        <div className="mx-auto w-full max-w-screen-2xl">
-          <div className="flex h-16 items-center px-4 md:px-6">
+      <header className="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-200" style={{ overflow: 'visible' }}>
+        <div className="mx-auto w-full max-w-screen-2xl" style={{ overflow: 'visible' }}>
+          <div className="flex h-16 items-center px-4 md:px-6" style={{ overflow: 'visible' }}>
             {/* Mobile menu toggle */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
@@ -457,22 +534,39 @@ export function DashboardPage() {
                 onClick={() => setActiveTab("clients")}>
                 Ventes & Clients
                       </Button>
-              
-
             </nav>
 
-            {/* Search bar - Desktop */}
-            <div className="flex-1 ml-4 max-w-md">
-              <form onSubmit={handleSearch} className="relative w-full">
-                <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground dark:text-gray-400" />
-                <Input
-                  type="search"
-                  placeholder="Rechercher médicaments, clients..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-4 py-2 h-9 w-full bg-slate-50 dark:bg-gray-700 border-slate-200 dark:border-gray-600 rounded-md transition-all dark:text-white dark:placeholder-gray-400"
-                />
-              </form>
+            {/* Search bar using our new SearchBox component */}
+            <div className="flex-1 ml-4 max-w-md relative" style={{ 
+              zIndex: 2147483647, 
+              position: 'relative',
+              overflow: 'visible' 
+            }}>
+              <SearchBox 
+                placeholder="Rechercher médicaments, clients..."
+                size="md"
+                maxWidth="w-full"
+                showTabs={true}
+                isDashboard={true}
+                positionMode="container-relative"
+                onResultClick={(result) => {
+                  // Switch to appropriate tab based on result type
+                  switch (result.type) {
+                    case 'medication':
+                      setActiveTab("inventory");
+                      break;
+                    case 'client':
+                      setActiveTab("clients");
+                      break;
+                    case 'prescription':
+                      setActiveTab("prescriptions");
+                      break;
+                    case 'sale':
+                      // You might want to add a sales tab
+                      break;
+                  }
+                }}
+              />
             </div>
 
             {/* Actions */}
@@ -586,7 +680,7 @@ export function DashboardPage() {
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="flex justify-between items-center">
             <TabsList className="bg-white border rounded-lg p-1 shadow-sm">
-              {getRoleBasedTabs().map((tab) => (
+              {getRoleBasedTabs().map((tab: { value: string, label: string, icon: string }) => (
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
@@ -681,3 +775,4 @@ export function DashboardPage() {
     </div>
   )
 }
+

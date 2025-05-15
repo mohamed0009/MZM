@@ -23,20 +23,20 @@ const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
   }, ref) => {
     return (
       <div
-        ref={ref}
-        className={cn(
+    ref={ref}
+    className={cn(
           'overflow-auto relative',
           withShadows && 'scroll-shadow',
           hideScrollbar && 'hide-scrollbar',
           autoHeight ? 'max-h-full h-auto' : '',
-          className
-        )}
+      className
+    )}
         style={{ 
           maxHeight: autoHeight ? 'none' : maxHeight,
           ...(props.style || {})
         }}
-        {...props}
-      >
+    {...props}
+  >
         {children}
       </div>
     )

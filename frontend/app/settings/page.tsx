@@ -1,37 +1,39 @@
 "use client"
 
-import { SettingsForm } from "@/components/auth/settings-form"
-import { Settings } from "lucide-react"
+import { Settings as SettingsIcon, ArrowLeft } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 
 export default function SettingsPage() {
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-7xl">
-      <div className="flex flex-col gap-6">
-        {/* Header with gradient background */}
-        <div className="bg-gradient-to-r from-teal-500 via-blue-500 to-indigo-500 rounded-2xl p-6 shadow-xl text-white mb-2 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-15 bg-center"></div>
-          <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full bg-white/10 blur-3xl animate-pulse"></div>
-          <div className="absolute -top-12 -left-12 w-36 h-36 rounded-full bg-blue-300/10 blur-3xl animate-pulse"></div>
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-200 via-white/20 to-cyan-200 opacity-30"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-x"></div>
-          
-          <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center relative z-10">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
-                <Settings className="h-7 w-7 text-white/90" />
-                Paramètres
-              </h1>
-              <p className="text-sm text-cyan-100 mt-1 flex items-center">
-                Personnalisez vos préférences et configurez votre application
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mx-auto w-full max-w-2xl">
-          <SettingsForm />
-        </div>
+      <div className="mb-6">
+        <Link href="/dashboard" className="text-slate-600 hover:text-slate-800 inline-flex items-center">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Retour au tableau de bord
+        </Link>
       </div>
+      
+      <Card className="border-slate-200 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-100">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="bg-slate-200 p-2 rounded-full">
+              <SettingsIcon className="h-5 w-5 text-slate-700" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-slate-800">Paramètres</CardTitle>
+          </div>
+          <CardDescription>Configurez les paramètres de votre application</CardDescription>
+        </CardHeader>
+        
+        <CardContent className="p-6">
+          <div className="min-h-[400px] flex items-center justify-center">
+            <p className="text-slate-500 text-center">
+              Module de paramètres en cours de développement.<br />
+              Revenez bientôt pour accéder à cette fonctionnalité.
+            </p>
+        </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

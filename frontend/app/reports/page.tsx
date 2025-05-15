@@ -1,98 +1,39 @@
-import type { Metadata } from "next"
-import { PermissionGuard } from "@/components/auth/permission-guard"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MainNav } from "@/components/dashboard/main-nav"
-import { UserNav } from "@/components/dashboard/user-nav"
-import { BarChart, LineChart, PieChart } from "lucide-react"
+"use client"
 
-export const metadata: Metadata = {
-  title: "Rapports - PharmaSys",
-  description: "Rapports et statistiques de la pharmacie",
-}
+import { BarChart2, ArrowLeft } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 
 export default function ReportsPage() {
   return (
-    <PermissionGuard permission="view_reports">
-      <div className="flex min-h-screen flex-col">
-        <div className="border-b">
-          <div className="flex h-16 items-center px-4">
-            <MainNav className="mx-6" />
-            <div className="ml-auto flex items-center space-x-4">
-              <UserNav />
-            </div>
-          </div>
-        </div>
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight text-pharma-primary">Rapports</h2>
-          </div>
-          <Tabs defaultValue="sales" className="space-y-4">
-            <TabsList className="bg-pharma-primary/5 p-1">
-              <TabsTrigger 
-                value="sales" 
-                className="data-[state=active]:bg-pharma-primary data-[state=active]:text-white"
-              >
-                <BarChart className="mr-2 h-4 w-4" />
-                Ventes
-              </TabsTrigger>
-              <TabsTrigger 
-                value="inventory"
-                className="data-[state=active]:bg-pharma-primary data-[state=active]:text-white"
-              >
-                <LineChart className="mr-2 h-4 w-4" />
-                Inventaire
-              </TabsTrigger>
-              <TabsTrigger 
-                value="clients"
-                className="data-[state=active]:bg-pharma-primary data-[state=active]:text-white"
-              >
-                <PieChart className="mr-2 h-4 w-4" />
-                Clients
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="sales" className="space-y-4">
-              <Card className="border-pharma-primary/20 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-pharma-primary">Rapport des ventes</CardTitle>
-                  <CardDescription>Analyse des ventes sur les 30 derniers jours</CardDescription>
-                </CardHeader>
-                <CardContent className="pl-2">
-                  <div className="h-[300px] w-full bg-pharma-primary/5 rounded-lg flex items-center justify-center border border-pharma-primary/10">
-                    <p className="text-pharma-primary/70">Graphique des ventes (visible uniquement pour les administrateurs et pharmaciens)</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="inventory" className="space-y-4">
-              <Card className="border-pharma-secondary/20 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-pharma-secondary">Rapport d'inventaire</CardTitle>
-                  <CardDescription>Analyse de l'inventaire et des stocks</CardDescription>
-                </CardHeader>
-                <CardContent className="pl-2">
-                  <div className="h-[300px] w-full bg-pharma-secondary/5 rounded-lg flex items-center justify-center border border-pharma-secondary/10">
-                    <p className="text-pharma-secondary/70">Graphique d'inventaire (visible uniquement pour les administrateurs et pharmaciens)</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="clients" className="space-y-4">
-              <Card className="border-pharma-accent/20 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-pharma-accent">Rapport clients</CardTitle>
-                  <CardDescription>Analyse de la clientèle</CardDescription>
-                </CardHeader>
-                <CardContent className="pl-2">
-                  <div className="h-[300px] w-full bg-pharma-accent/5 rounded-lg flex items-center justify-center border border-pharma-accent/10">
-                    <p className="text-pharma-accent/70">Graphique clients (visible uniquement pour les administrateurs et pharmaciens)</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+    <div className="container mx-auto p-4 md:p-6 max-w-7xl">
+      <div className="mb-6">
+        <Link href="/dashboard" className="text-slate-600 hover:text-purple-600 inline-flex items-center">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Retour au tableau de bord
+        </Link>
       </div>
-    </PermissionGuard>
+      
+      <Card className="border-slate-200 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 border-b border-slate-100">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="bg-purple-100 p-2 rounded-full">
+              <BarChart2 className="h-5 w-5 text-purple-600" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-slate-800">Rapports et Statistiques</CardTitle>
+          </div>
+          <CardDescription>Visualisez et analysez les données de votre pharmacie</CardDescription>
+                </CardHeader>
+        
+        <CardContent className="p-6">
+          <div className="min-h-[400px] flex items-center justify-center">
+            <p className="text-slate-500 text-center">
+              Module de rapports en cours de développement.<br />
+              Revenez bientôt pour accéder à cette fonctionnalité.
+            </p>
+                  </div>
+                </CardContent>
+              </Card>
+      </div>
   )
 }

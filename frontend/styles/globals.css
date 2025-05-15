@@ -92,3 +92,63 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Make search results always appear on top */
+.search-results-dropdown {
+  z-index: 2147483647 !important; /* Maximum z-index value */
+  position: fixed !important; /* Force fixed positioning */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  animation: fadeInDown 0.2s ease-out;
+  background: white;
+  padding: 0;
+  margin: 0;
+}
+
+/* Style the search results to make them stand out */
+.search-results-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 30px;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  transform: rotate(45deg);
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Extra styling for dashboard search results */
+.dashboard-search-results {
+  margin-top: 8px;
+  z-index: 99999 !important; /* Extra high z-index for dashboard */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important; /* Stronger shadow */
+  border-radius: 8px !important;
+  border: 1px solid rgba(6, 182, 212, 0.2) !important; /* Teal border to match theme */
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Animation for search results */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-results-dropdown {
+  animation: fadeInDown 0.2s ease-out;
+}
+
+/* Add a new style for search container */
+.search-container {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 2147483647 !important;
+}

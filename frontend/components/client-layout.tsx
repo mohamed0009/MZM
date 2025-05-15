@@ -11,7 +11,7 @@ export default function ClientLayout({
   const pathname = usePathname()
   
   // Routes where the header should be hidden
-  const noHeaderRoutes = ['/', '/features', '/about', '/contact']
+  const noHeaderRoutes = ['/', '/features', '/about', '/contact', '/tarifs', '/temoignages', '/faq', '/mentions-legales', '/carrieres']
   const isAuthPage = pathname?.startsWith("/auth/")
   const shouldShowHeader = !noHeaderRoutes.includes(pathname || '') && !isAuthPage
 
