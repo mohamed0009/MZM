@@ -16,8 +16,8 @@ public class PharmaFlowApplication {
         return args -> {
             System.out.println("=======================================================");
             System.out.println("         PharmaFlow Backend Server Started");
-            System.out.println("         API disponible sur: http://localhost:8080/api");
-            System.out.println("         Test API: http://localhost:8080/api/test/echo");
+            System.out.println("         API disponible sur: http://localhost:8081/api");
+            System.out.println("         Test API: http://localhost:8081/api/test/echo");
             System.out.println("=======================================================");
         };
     }

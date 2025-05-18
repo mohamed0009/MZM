@@ -1,183 +1,211 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useApi } from "@/hooks/use-api";
+import { useApi } from "../hooks/use-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, AlertCircle, XCircle } from "lucide-react";
-import axios from "axios";
+import { CheckCircle, AlertCircle, XCircle, Loader2, RefreshCw, Database } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight } from "lucide-react";
 
-export function ConnectionTest() {
-  const [testEchoStatus, setTestEchoStatus] = useState<"loading" | "success" | "error">("loading");
-  const [authStatus, setAuthStatus] = useState<"loading" | "success" | "error">("loading");
-  const [inventoryStatus, setInventoryStatus] = useState<"loading" | "success" | "error">("loading");
-  const [clientsStatus, setClientsStatus] = useState<"loading" | "success" | "error">("loading");
-  const [permissionsStatus, setPermissionsStatus] = useState<"loading" | "success" | "error">("loading");
-  const [message, setMessage] = useState<string>("");
-  const { api, test } = useApi();
+export default function ConnectionTest({ onInitialize }: { onInitialize?: () => void }) {
+  const { testConnection } = useApi();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'loading' | 'connected' | 'error'>('idle');
+  const [result, setResult] = useState<any>(null);
+  const [initStatus, setInitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const testEchoEndpoint = async () => {
-    setTestEchoStatus("loading");
+  const checkConnection = async () => {
     try {
-      const result = await test.checkConnection();
-      if (result.connected) {
-        setTestEchoStatus("success");
-        return true;
+      setConnectionStatus('loading');
+      setIsLoading(true);
+      const testResult = await testConnection();
+      console.log("Connection test result:", testResult);
+      
+      if (testResult && testResult.success) {
+        setConnectionStatus('connected');
+        setResult(testResult.data);
+      } else {
+        setConnectionStatus('error');
+        setError("Failed to connect to backend");
       }
-      setTestEchoStatus("error");
-      return false;
+    } catch (error: any) {
+      console.error("Connection test error:", error);
+      setConnectionStatus('error');
+      setError(error.message || "Unknown error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const initializeData = async () => {
+    try {
+      setInitStatus('loading');
+      // Using direct fetch to initialize data with the correct API endpoint
+      const result = await fetch('/api/data/init-sample-data', {
+        method: 'POST'
+      }).then(res => res.json());
+      
+      console.log("Data initialization result:", result);
+      if (result && result.success) {
+        setInitStatus('success');
+        if (onInitialize) {
+          onInitialize();
+        }
+      } else {
+        setInitStatus('error');
+      }
     } catch (error) {
-      setTestEchoStatus("error");
-      return false;
+      console.error("Data initialization error:", error);
+      setInitStatus('error');
     }
   };
 
-  const testAuthEndpoint = async () => {
-    setAuthStatus("loading");
-    try {
-      const response = await api.get("/auth/test", { timeout: 5000 });
-      setAuthStatus("success");
-      return true;
-    } catch (error: unknown) {
-      // Even if the endpoint returns a 401 error, it means the API is accessible
-      if (axios.isAxiosError(error) && error.response) {
-        setAuthStatus("success");
-        return true;
-      }
-      setAuthStatus("error");
-      return false;
-    }
-  };
-
-  const testInventoryEndpoint = async () => {
-    setInventoryStatus("loading");
-    try {
-      const response = await api.get("/inventory/products", { timeout: 5000 });
-      setInventoryStatus("success");
-      return true;
-    } catch (error: unknown) {
-      // If 401 or 403, API exists but requires auth
-      if (axios.isAxiosError(error) && (error.response?.status === 401 || error.response?.status === 403)) {
-        setInventoryStatus("success");
-        return true;
-      }
-      setInventoryStatus("error");
-      return false;
-    }
-  };
-
-  const testClientsEndpoint = async () => {
-    setClientsStatus("loading");
-    try {
-      const response = await api.get("/clients", { timeout: 5000 });
-      setClientsStatus("success");
-      return true;
-    } catch (error: unknown) {
-      // If 401 or 403, API exists but requires auth
-      if (axios.isAxiosError(error) && (error.response?.status === 401 || error.response?.status === 403)) {
-        setClientsStatus("success");
-        return true;
-      }
-      setClientsStatus("error");
-      return false;
-    }
-  };
-
-  const testPermissionsEndpoint = async () => {
-    setPermissionsStatus("loading");
-    try {
-      const response = await api.get("/permissions/all", { timeout: 5000 });
-      setPermissionsStatus("success");
-      return true;
-    } catch (error: unknown) {
-      // If 401 or 403, API exists but requires auth
-      if (axios.isAxiosError(error) && (error.response?.status === 401 || error.response?.status === 403)) {
-        setPermissionsStatus("success");
-        return true;
-      }
-      setPermissionsStatus("error");
-      return false;
-    }
-  };
-
-  const runAllTests = async () => {
-    setMessage("");
-    const echoResult = await testEchoEndpoint();
-    
-    if (echoResult) {
-      setMessage("Test /test/echo réussi! La connexion de base avec le backend est établie.");
-      
-      // Continue with other tests
-      const authResult = await testAuthEndpoint();
-      const inventoryResult = await testInventoryEndpoint();
-      const clientsResult = await testClientsEndpoint();
-      const permissionsResult = await testPermissionsEndpoint();
-      
-      if (authResult && inventoryResult && clientsResult && permissionsResult) {
-        setMessage("Tous les tests ont réussi! La connexion avec le backend est établie.");
-      } else if (authResult || inventoryResult || clientsResult || permissionsResult) {
-        setMessage("Test de base réussi, mais certains endpoints ne sont pas accessibles. Le backend est partiellement disponible.");
-      }
-    } else {
-      setMessage("Impossible de se connecter au backend. Vérifiez que le serveur est démarré et accessible.");
-    }
-  };
-
+  // Automatically check connection on mount
   useEffect(() => {
-    runAllTests();
+    checkConnection();
   }, []);
 
-  const getStatusIcon = (status: "loading" | "success" | "error") => {
-    if (status === "success") return <CheckCircle className="h-5 w-5 text-green-500" />;
-    if (status === "error") return <XCircle className="h-5 w-5 text-red-500" />;
-    return <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-pharma-primary" />;
-  };
-
   return (
-    <Card className="w-full max-w-lg mx-auto my-8">
+    <Card className="border border-slate-200 shadow-sm">
       <CardHeader>
-        <CardTitle className="text-xl">Test de connexion avec le backend</CardTitle>
-        <CardDescription>Vérification de la connexion avec les différentes API du backend</CardDescription>
+        <CardTitle className="text-xl flex items-center gap-2">
+          <Database className="h-5 w-5 text-blue-600" />
+          Connexion au Serveur Backend
+        </CardTitle>
+        <CardDescription>
+          Vérifiez la connexion avec le serveur de base de données de l'application
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-md">
-            <span>Test Echo API</span>
-            {getStatusIcon(testEchoStatus)}
+      
+      <CardContent>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {connectionStatus === 'loading' && <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />}
+              {connectionStatus === 'connected' && <CheckCircle className="h-5 w-5 text-green-600" />}
+              {connectionStatus === 'error' && <XCircle className="h-5 w-5 text-red-600" />}
+              {connectionStatus === 'idle' && <AlertCircle className="h-5 w-5 text-amber-600" />}
+              
+              <div>
+                <div className="font-medium">Status de la Connexion</div>
+                <div className="text-sm text-slate-500">
+                  {connectionStatus === 'loading' && "Test de connexion en cours..."}
+                  {connectionStatus === 'connected' && "Connecté au serveur backend"}
+                  {connectionStatus === 'error' && "Erreur de connexion au serveur"}
+                  {connectionStatus === 'idle' && "Test de connexion non effectué"}
+                </div>
+              </div>
+            </div>
+            
+            <Badge 
+              variant={connectionStatus === 'connected' ? "default" : "outline"}
+              className={
+                connectionStatus === 'connected' 
+                  ? "bg-green-100 text-green-800 hover:bg-green-200 border-0"
+                  : connectionStatus === 'error'
+                    ? "bg-red-100 text-red-800 hover:bg-red-200 border-0"
+                    : connectionStatus === 'loading'
+                      ? "bg-blue-100 text-blue-800 hover:bg-blue-200 border-0"
+                      : "bg-amber-100 text-amber-800 hover:bg-amber-200 border-0"
+              }
+            >
+              {connectionStatus === 'connected' && "Connecté"}
+              {connectionStatus === 'error' && "Déconnecté"}
+              {connectionStatus === 'loading' && "Vérification..."}
+              {connectionStatus === 'idle' && "En attente"}
+            </Badge>
           </div>
-          <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-md">
-            <span>API d'authentification</span>
-            {getStatusIcon(authStatus)}
-          </div>
-          <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-md">
-            <span>API d'inventaire</span>
-            {getStatusIcon(inventoryStatus)}
-          </div>
-          <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-md">
-            <span>API des clients</span>
-            {getStatusIcon(clientsStatus)}
-          </div>
-          <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-md">
-            <span>API des permissions</span>
-            {getStatusIcon(permissionsStatus)}
-          </div>
+          
+          {connectionStatus === 'connected' && (
+            <Alert className="bg-green-50 border-green-200">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-800">Serveur disponible</AlertTitle>
+              <AlertDescription className="text-green-700">
+                La connexion au serveur backend est établie. L'API est accessible à {result?.message}
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {connectionStatus === 'error' && (
+            <Alert className="bg-red-50 border-red-200">
+              <XCircle className="h-4 w-4 text-red-600" />
+              <AlertTitle className="text-red-800">Erreur de connexion</AlertTitle>
+              <AlertDescription className="text-red-700">
+                Impossible de se connecter au serveur backend. Veuillez vérifier que le serveur est en cours d'exécution sur le port 8081.
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {connectionStatus === 'connected' && (
+            <div className="pt-2">
+              <div className="mb-2 font-medium text-slate-800">Initialiser les données</div>
+              <div className="text-sm text-slate-500 mb-4">
+                Remplir la base de données avec des données de démonstration pour l'application (produits, clients, etc.)
+              </div>
+              
+              <Button 
+                onClick={initializeData}
+                disabled={initStatus === 'loading' || initStatus === 'success'}
+                className={
+                  initStatus === 'success' 
+                    ? "bg-green-600 hover:bg-green-700" 
+                    : initStatus === 'error'
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-blue-600 hover:bg-blue-700"
+                }
+              >
+                {initStatus === 'loading' && (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Initialisation en cours...
+                  </>
+                )}
+                {initStatus === 'success' && (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Données initialisées
+                  </>
+                )}
+                {initStatus === 'error' && (
+                  <>
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Réessayer l'initialisation
+                  </>
+                )}
+                {initStatus === 'idle' && (
+                  <>
+                    <Database className="mr-2 h-4 w-4" />
+                    Initialiser les données de démo
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
-
-        {message && (
-          <Alert variant={message.includes("réussi") ? "default" : "destructive"}>
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>État de la connexion</AlertTitle>
-            <AlertDescription>{message}</AlertDescription>
-          </Alert>
-        )}
       </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={runAllTests} 
-          className="w-full bg-pharma-primary hover:bg-pharma-primary/90"
+      
+      <CardFooter className="flex justify-end border-t border-slate-100 pt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={checkConnection}
+          disabled={connectionStatus === 'loading'}
+          className="text-blue-600 border-blue-200 hover:bg-blue-50"
         >
-          Tester à nouveau
+          {connectionStatus === 'loading' ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Vérification...
+            </>
+          ) : (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Tester à nouveau
+            </>
+          )}
         </Button>
       </CardFooter>
     </Card>

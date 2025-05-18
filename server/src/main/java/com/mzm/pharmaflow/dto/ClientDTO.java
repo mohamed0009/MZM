@@ -13,6 +13,8 @@ public class ClientDTO {
     
     private Long id;
     private String name;
+    private String firstName;
+    private String lastName;
     private String email;
     private String phone;
     private LocalDate birthDate;
@@ -20,6 +22,7 @@ public class ClientDTO {
     private String status;
     private LocalDate lastVisit;
     private String medicalNotes;
+    private String medicalHistory;
     private Boolean hasPrescription;
     private String avatar;
     private LocalDate createdAt;

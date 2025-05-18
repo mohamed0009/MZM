@@ -31,7 +31,9 @@ public class ClientServiceImpl implements ClientService {
     private ClientDTO convertToDto(Client client) {
         ClientDTO dto = new ClientDTO();
         dto.setId(client.getId());
-        dto.setName(client.getName());
+        dto.setFirstName(client.getFirstName());
+        dto.setLastName(client.getLastName());
+        dto.setName(client.getFirstName() + " " + client.getLastName());
         dto.setEmail(client.getEmail());
         dto.setPhone(client.getPhone());
         dto.setBirthDate(client.getBirthDate());
@@ -39,6 +41,7 @@ public class ClientServiceImpl implements ClientService {
         dto.setStatus(client.getStatus().name());
         dto.setLastVisit(client.getLastVisit());
         dto.setMedicalNotes(client.getMedicalNotes());
+        dto.setMedicalHistory(client.getMedicalHistory());
         dto.setHasPrescription(client.getHasPrescription());
         dto.setAvatar(client.getAvatar());
         dto.setCreatedAt(client.getCreatedAt());
@@ -57,11 +60,13 @@ public class ClientServiceImpl implements ClientService {
                         .orElse(new Client())
                 : new Client();
         
-        client.setName(dto.getName());
+        client.setFirstName(dto.getFirstName());
+        client.setLastName(dto.getLastName());
         client.setEmail(dto.getEmail());
         client.setPhone(dto.getPhone());
         client.setBirthDate(dto.getBirthDate());
         client.setAddress(dto.getAddress());
+        client.setMedicalHistory(dto.getMedicalHistory());
         
         if (dto.getStatus() != null) {
             try {

@@ -64,7 +64,15 @@ public class ProductServiceImpl implements ProductService {
         product.setName(dto.getName());
         product.setCode(dto.getCode());
         product.setDescription(dto.getDescription());
-        product.setCategory(ProductCategory.valueOf(dto.getCategory()));
+        
+        // Handle category conversion safely
+        try {
+            product.setCategory(ProductCategory.valueOf(dto.getCategory()));
+        } catch (IllegalArgumentException e) {
+            // Default to OTHER if category is invalid
+            product.setCategory(ProductCategory.OTHER);
+        }
+        
         product.setQuantity(dto.getQuantity());
         product.setThreshold(dto.getThreshold());
         product.setPrice(dto.getPrice());
@@ -99,6 +107,16 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    public ProductDTO update(ProductDTO productDTO) {
+        // First check if the product exists
+        if (productDTO.getId() == null || !productRepository.existsById(productDTO.getId())) {
+            throw new EntityNotFoundException("Product not found for update");
+        }
+        // Then perform the update using the same save logic
+        return save(productDTO);
+    }
+    
+    @Override
     public void deleteById(Long id) {
         if (!productRepository.existsById(id)) {
             throw new EntityNotFoundException("Product not found with id: " + id);
@@ -114,8 +132,24 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    public List<ProductDTO> search(String query) {
+        // Search by name or description
+        return productRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
     public List<ProductDTO> findLowStockProducts() {
         return productRepository.findByQuantityLessThanEqualToThreshold().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<ProductDTO> findExpiringSoon() {
+        LocalDate threeMonthsFromNow = LocalDate.now().plusMonths(3);
+        return productRepository.findByExpiryDateBefore(threeMonthsFromNow).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }

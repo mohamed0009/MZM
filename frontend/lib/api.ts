@@ -70,6 +70,30 @@ api.interceptors.response.use(
       }
     }
     
+    // Handle timeout errors specifically for faster fallback
+    if (error.message && error.message.includes('timeout')) {
+      console.log('Request timeout detected, failing fast...');
+      return Promise.reject(new Error('Request timeout'));
+    }
+    
+    // Handle server unavailable (CORS, network error, 500 errors)
+    if (
+      error.message === 'Network Error' || 
+      error.code === 'ECONNABORTED' || 
+      error.response?.status >= 500
+    ) {
+      console.log('Server appears to be unavailable, trying mock API fallback...');
+      
+      // Set custom header to trigger mock API route
+      if (originalRequest && !originalRequest._mockRetry) {
+        originalRequest._mockRetry = true;
+        originalRequest.headers['x-use-mock'] = 'true';
+        
+        // Retry with mock API
+        return api(originalRequest);
+      }
+    }
+    
     // Enhanced error logging
     if (process.env.NODE_ENV !== 'production') {
       console.error('API Response Error:', error.message);

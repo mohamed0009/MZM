@@ -11,6 +11,7 @@ interface ECGAnimationProps {
   className?: string
   showBackground?: boolean
   strokeWidth?: number
+  isAnimating?: boolean
 }
 
 const ECGAnimation = ({
@@ -20,7 +21,8 @@ const ECGAnimation = ({
   speed = 1.5,
   className = "",
   showBackground = true,
-  strokeWidth = 2
+  strokeWidth = 2,
+  isAnimating = true
 }: ECGAnimationProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -168,7 +170,7 @@ const ECGAnimation = ({
           </mask>
         </defs>
         
-        {/* Primary ECG Path - Moving right to left */}
+        {/* Primary ECG Path - Moving left to right */}
         <motion.path
           d={generateECGPath()}
           fill="none"
@@ -177,16 +179,16 @@ const ECGAnimation = ({
           strokeLinecap="round"
           strokeLinejoin="round"
           mask="url(#edgeFadeMask)"
-          animate={{
-            x: [0, -width],
-          }}
-          transition={{
+          animate={isAnimating ? {
+            x: [0, width],
+          } : { x: 0 }}
+          transition={isAnimating ? {
             duration: speed * 6,
             repeat: Infinity,
             repeatType: "loop",
             ease: "linear",
             times: [0, 1],
-          }}
+          } : {}}
         />
         
         {/* Secondary ECG Path (offset) for continuous flow */}
@@ -198,17 +200,17 @@ const ECGAnimation = ({
           strokeLinecap="round"
           strokeLinejoin="round"
           mask="url(#edgeFadeMask)"
-          initial={{ x: width }}
-          animate={{
-            x: [width, 0],
-          }}
-          transition={{
+          initial={{ x: isAnimating ? -width : 0 }}
+          animate={isAnimating ? {
+            x: [-width, 0],
+          } : { x: 0 }}
+          transition={isAnimating ? {
             duration: speed * 6,
             repeat: Infinity,
             repeatType: "loop",
             ease: "linear",
             times: [0, 1],
-          }}
+          } : {}}
         />
         
         {/* Tertiary ECG Path (additional offset) for extra smoothness */}
@@ -220,47 +222,51 @@ const ECGAnimation = ({
           strokeLinecap="round"
           strokeLinejoin="round"
           mask="url(#edgeFadeMask)"
-          initial={{ x: width * 2 }}
-          animate={{
-            x: [width * 2, width],
-          }}
-          transition={{
+          initial={{ x: isAnimating ? -width * 2 : 0 }}
+          animate={isAnimating ? {
+            x: [-width * 2, -width],
+          } : { x: 0 }}
+          transition={isAnimating ? {
             duration: speed * 6,
             repeat: Infinity,
             repeatType: "loop",
             ease: "linear",
             times: [0, 1],
-          }}
+          } : {}}
         />
       </svg>
       
       {/* Enhanced Glow Line (Scan Effect) with dual elements for continuous flow */}
       <div className="relative w-full h-full">
-        <motion.div
-          className="absolute top-0 h-full w-1.5 bg-gradient-to-b from-transparent via-teal-400/60 to-transparent"
-          style={{ filter: 'blur(4px)' }}
-          initial={{ left: "-5%" }}
-          animate={{ left: "105%" }}
-          transition={{
-            duration: speed * 6,
-            repeat: Infinity,
-            repeatType: "loop",
-            ease: "linear",
-          }}
-        />
-        <motion.div
-          className="absolute top-0 h-full w-1.5 bg-gradient-to-b from-transparent via-teal-400/30 to-transparent"
-          style={{ filter: 'blur(6px)' }}
-          initial={{ left: "-35%" }}
-          animate={{ left: "135%" }}
-          transition={{
-            duration: speed * 6,
-            repeat: Infinity,
-            repeatType: "loop",
-            ease: "linear",
-            delay: speed * 2,
-          }}
-        />
+        {isAnimating && (
+          <>
+            <motion.div
+              className="absolute top-0 h-full w-1.5 bg-gradient-to-b from-transparent via-teal-400/60 to-transparent"
+              style={{ filter: 'blur(4px)' }}
+              initial={{ left: "105%" }}
+              animate={{ left: "-5%" }}
+              transition={{
+                duration: speed * 6,
+                repeat: Infinity,
+                repeatType: "loop",
+                ease: "linear",
+              }}
+            />
+            <motion.div
+              className="absolute top-0 h-full w-1.5 bg-gradient-to-b from-transparent via-teal-400/30 to-transparent"
+              style={{ filter: 'blur(6px)' }}
+              initial={{ left: "135%" }}
+              animate={{ left: "-35%" }}
+              transition={{
+                duration: speed * 6,
+                repeat: Infinity,
+                repeatType: "loop",
+                ease: "linear",
+                delay: speed * 2,
+              }}
+            />
+          </>
+        )}
       </div>
     </div>
   )

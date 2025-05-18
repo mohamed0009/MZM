@@ -32,7 +32,7 @@ public class BetterMock {
         server.createContext("/api/routes", new HttpHandler() {
           @Override
           public void handle(HttpExchange exchange) throws IOException {
-            handleCORS(exchange);
+            addCorsHeaders(exchange);
             if (exchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
               handlePreflight(exchange);
               return;
@@ -56,7 +56,7 @@ public class BetterMock {
         server.createContext("/api/dashboard/stats", new HttpHandler() {
           @Override
           public void handle(HttpExchange exchange) throws IOException {
-            handleCORS(exchange);
+            addCorsHeaders(exchange);
             if (exchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
               handlePreflight(exchange);
               return;

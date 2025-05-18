@@ -2,6 +2,8 @@ package com.mzm.pharmaflow.repository;
 
 import com.mzm.pharmaflow.model.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,11 +19,26 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     List<Client> findByStatus(String status);
     
     /**
-     * Search clients by name
+     * Search clients by first name or last name
      * @param name name to search for
      * @return list of matching clients
      */
-    List<Client> findByNameContainingIgnoreCase(String name);
+    @Query("SELECT c FROM Client c WHERE LOWER(c.firstName) LIKE LOWER(CONCAT('%', :name, '%')) OR LOWER(c.lastName) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<Client> findByNameContainingIgnoreCase(@Param("name") String name);
+    
+    /**
+     * Search clients by first name
+     * @param firstName first name to search for
+     * @return list of clients with matching first name
+     */
+    List<Client> findByFirstNameContainingIgnoreCase(String firstName);
+    
+    /**
+     * Search clients by last name
+     * @param lastName last name to search for
+     * @return list of clients with matching last name
+     */
+    List<Client> findByLastNameContainingIgnoreCase(String lastName);
     
     /**
      * Search clients by email

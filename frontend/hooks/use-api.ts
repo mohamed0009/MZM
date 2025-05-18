@@ -82,34 +82,25 @@ export function useApi() {
         console.log(`Fetching product ${id}...`);
         console.log(`Full request URL: ${getBaseUrl()}${requestUrl}`);
         
+        // Use a shorter timeout for better UX
         const response = await withTimeout(
           api.get(requestUrl),
-          5000
+          3000 // Reduced timeout for faster fallback
         );
         console.log("Product fetched successfully:", response.data);
         return response.data;
       } catch (error) {
         console.error(`Error fetching product ${id}:`, error);
         
-        // Find in mock data as fallback
+        // Find in mock data as immediate fallback
         const mockProduct = MOCK_PRODUCTS.find(p => p.id === id);
         if (mockProduct) {
           console.log("Returning mock product as fallback:", mockProduct);
           return mockProduct;
         }
         
-        // If nothing found, return a default mock product
-        console.error(`No mock product found for ID: ${id}`);
-        console.log("Returning default mock product");
-        return {
-          id: id,
-          name: "Produit de démonstration",
-          description: "Ce produit est affiché en mode démonstration car le serveur est indisponible.",
-          price: 0,
-          stock: 0,
-          category: "Autres",
-          expiry: ""
-        };
+        // For consistency, throw a clear error
+        throw new Error(`Product with ID ${id} not found`);
       }
     },
     createProduct: async (productData: any) => {
@@ -158,6 +149,48 @@ export function useApi() {
         // For demo purposes, simulate success
         console.log("Simulating successful product deletion");
         return { success: true };
+      }
+    }
+  };
+
+  // Orders related API calls
+  const ordersApi = {
+    createOrder: async (orderData: any) => {
+      try {
+        console.log("Creating new order:", orderData);
+        const response = await withTimeout(
+          api.post('/orders', orderData),
+          5000
+        );
+        console.log("Order created successfully:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("Error creating order:", error);
+        // For demo purposes, simulate success
+        console.log("Simulating successful order creation");
+        return { 
+          success: true, 
+          orderId: `ORD-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          ...orderData
+        };
+      }
+    },
+    
+    getOrders: async () => {
+      try {
+        console.log("Fetching all orders...");
+        const response = await withTimeout(
+          api.get('/orders'),
+          5000
+        );
+        console.log("Orders fetched successfully:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        // For demo purposes, return mock data
+        console.log("Returning mock orders as fallback");
+        return [];
       }
     }
   };
@@ -211,6 +244,7 @@ export function useApi() {
     auth: authApi,
     inventory: inventoryApi,
     clients: clientsApi,
+    orders: ordersApi,
     test: testApi,
     api // Expose the axios instance for custom calls
   };

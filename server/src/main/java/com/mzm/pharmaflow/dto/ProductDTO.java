@@ -24,8 +24,19 @@ public class ProductDTO {
     private String manufacturer;
     private String imageUrl;
     private Boolean needsPrescription;
+    private Boolean prescriptionRequired;
     private String dosage;
     private String formulation;
     private LocalDate createdAt;
     private LocalDate updatedAt;
+    
+    // Add getter and setter to keep both fields in sync
+    public Boolean getPrescriptionRequired() {
+        return needsPrescription;
+    }
+    
+    public void setPrescriptionRequired(Boolean prescriptionRequired) {
+        this.prescriptionRequired = prescriptionRequired;
+        this.needsPrescription = prescriptionRequired;
+    }
 } 

@@ -1,15 +1,15 @@
 @echo off
 echo Initializing Git repository...
-git init
+"C:\Program Files\Git\bin\git.exe" init
 echo Adding remote repository...
-git remote add origin https://github.com/iir-24-25/projet-devops-g7-xg7_g4.git
+"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/mohamed0009/MZM.git
 echo Adding files to staging...
-git add .
+"C:\Program Files\Git\bin\git.exe" add .
 echo Creating initial commit...
-git commit -m "Initial commit"
+"C:\Program Files\Git\bin\git.exe" commit -m "Initial commit"
 echo Setting branch name to main...
-git branch -M main
+"C:\Program Files\Git\bin\git.exe" branch -M main
 echo Pushing to GitHub...
-git push -u origin main
+"C:\Program Files\Git\bin\git.exe" push -u origin main
 echo Done!
 pause 
