@@ -1,0 +1,9 @@
+@echo off
+echo Setting Java home...
+set JAVA_HOME=.\jdk
+
+echo Compiling enhanced backend...
+%JAVA_HOME%\bin\javac.exe EnhancedMock.java
+
+echo Starting enhanced backend...
+%JAVA_HOME%\bin\java.exe EnhancedMock 

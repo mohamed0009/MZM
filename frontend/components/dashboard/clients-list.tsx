@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo, useCallback, useRef } from "react"
+import { useApi } from "@/hooks/use-api"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -37,13 +38,102 @@ interface ClientsListProps {
 }
 
 export function ClientsList({ data = [] }: ClientsListProps) {
+  const { clients } = useApi()
+  
+  // Track if we've already tried to fetch data
+  const fetchAttemptedRef = useRef(false)
+  
+  // Static client data for fallback
+  const staticClients = useMemo(() => [
+    {
+      id: 1,
+      name: "Mohammed Alami",
+      email: "mohammed.alami@gmail.com",
+      phone: "06 12 34 56 78",
+      birthDate: new Date(1975, 5, 15),
+      lastVisit: new Date(2024, 3, 10),
+      status: "régulier",
+      hasPrescription: true,
+      avatar: "/images/placeholder-avatar.png",
+    },
+    {
+      id: 2,
+      name: "Fatima Benali",
+      email: "fatima.benali@gmail.com",
+      phone: "06 23 45 67 89",
+      birthDate: new Date(1982, 8, 22),
+      lastVisit: new Date(2024, 3, 15),
+      status: "régulier",
+      hasPrescription: false,
+      avatar: "/images/placeholder-avatar.png",
+    },
+    {
+      id: 3,
+      name: "Youssef Mansouri",
+      email: "youssef.mansouri@gmail.com",
+      phone: "06 34 56 78 90",
+      birthDate: new Date(1968, 2, 10),
+      lastVisit: new Date(2024, 2, 28),
+      status: "occasionnel",
+      hasPrescription: true,
+      avatar: "/images/placeholder-avatar.png",
+    },
+    {
+      id: 4,
+      name: "Amina Tazi",
+      email: "amina.tazi@gmail.com",
+      phone: "06 45 67 89 01",
+      birthDate: new Date(1990, 11, 5),
+      lastVisit: new Date(2024, 3, 18),
+      status: "nouveau",
+      hasPrescription: true,
+      avatar: "/images/placeholder-avatar.png",
+    },
+    {
+      id: 5,
+      name: "Karim Idrissi",
+      email: "karim.idrissi@gmail.com",
+      phone: "06 56 78 90 12",
+      birthDate: new Date(1985, 7, 30),
+      lastVisit: new Date(2024, 3, 5),
+      status: "régulier",
+      hasPrescription: false,
+      avatar: "/images/placeholder-avatar.png",
+    },
+    {
+      id: 6,
+      name: "Nadia Chraibi",
+      email: "nadia.chraibi@gmail.com",
+      phone: "06 67 89 01 23",
+      birthDate: new Date(1995, 4, 12),
+      lastVisit: new Date(2024, 3, 20),
+      status: "nouveau",
+      hasPrescription: false,
+      avatar: "/images/placeholder-avatar.png",
+    },
+    {
+      id: 7,
+      name: "Hassan Benjelloun",
+      email: "hassan.benjelloun@gmail.com",
+      phone: "06 78 90 12 34",
+      birthDate: new Date(1972, 9, 8),
+      lastVisit: new Date(2024, 3, 1),
+      status: "régulier",
+      hasPrescription: true,
+      avatar: "/images/placeholder-avatar.png",
+    },
+  ], []);
+  
   const [searchTerm, setSearchTerm] = useState("")
   const [openDialog, setOpenDialog] = useState(false)
   const [editDialog, setEditDialog] = useState(false)
   const [deleteDialog, setDeleteDialog] = useState(false)
   const [viewDialog, setViewDialog] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
-  const [clientsData, setClientsData] = useState(data)
+  // Initialize with the provided data or static data
+  const [clientsData, setClientsData] = useState<any[]>(data.length > 0 ? data : staticClients)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const [newClient, setNewClient] = useState({
     name: "",
     email: "",
@@ -64,17 +154,72 @@ export function ClientsList({ data = [] }: ClientsListProps) {
   const [success, setSuccess] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
-  // Filtrer les clients en fonction de la recherche et du statut
-  const filteredClients = clientsData.filter(
-    (client) =>
-      (client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.phone.includes(searchTerm)) &&
-      (statusFilter === "all" || client.status === statusFilter),
-  )
+  // Fetch clients from API exactly once when component mounts
+  useEffect(() => {
+    // Skip API calls if:
+    // 1. We have data from props already
+    // 2. We've already attempted to fetch
+    if (data.length > 0 || fetchAttemptedRef.current) {
+      return;
+    }
+    
+    console.log("INITIAL FETCH ATTEMPT - This should appear exactly once");
+    
+    // Mark that we've attempted to fetch
+    fetchAttemptedRef.current = true;
+    
+    let isMounted = true;
+    
+    async function fetchClients() {
+      try {
+        console.log("Fetching clients from API...");
+        setLoading(true);
+        
+        const fetchedClients = await clients.getClients();
+        console.log("Clients fetched:", fetchedClients);
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          if (Array.isArray(fetchedClients)) {
+            setClientsData(fetchedClients);
+          } else {
+            console.error("Clients data is not an array:", fetchedClients);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+        if (isMounted) {
+          setError("Failed to fetch clients from server");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    
+    fetchClients();
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array - run once on mount only
 
-  const handleAddClient = () => {
-    // Ajouter un nouveau client
+  // Filter clients based on search and status - memoize to avoid recalculating on every render
+  const filteredClients = useMemo(() => {
+    return clientsData.filter(
+      (client) =>
+        (client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          client.phone?.includes(searchTerm)) &&
+        (statusFilter === "all" || client.status === statusFilter)
+    );
+  }, [clientsData, searchTerm, statusFilter]);
+
+  // Memoize event handlers to prevent recreating functions on every render
+  const handleAddClient = useCallback(() => {
+    // Add a new client
     const newId = Math.max(...clientsData.map((client) => client.id)) + 1
     const newClientData = {
       id: newId,
@@ -85,14 +230,14 @@ export function ClientsList({ data = [] }: ClientsListProps) {
       lastVisit: new Date(),
       status: newClient.status,
       hasPrescription: newClient.hasPrescription,
-      avatar: "/placeholder-user.jpg",
+      avatar: "/images/placeholder-avatar.png",
     }
 
-    setClientsData([...clientsData, newClientData])
+    setClientsData((prev) => [...prev, newClientData])
     setSuccess(`Le client ${newClient.name} a été ajouté avec succès.`)
     setOpenDialog(false)
 
-    // Réinitialiser le formulaire après 3 secondes
+    // Reset the form after 3 seconds
     setTimeout(() => {
       setSuccess("")
       setNewClient({
@@ -104,10 +249,10 @@ export function ClientsList({ data = [] }: ClientsListProps) {
         status: "nouveau",
       })
     }, 3000)
-  }
+  }, [clientsData, newClient]);
 
-  const handleEditClient = () => {
-    // Mettre à jour le client
+  const handleEditClient = useCallback(() => {
+    // Update the client
     const updatedClients = clientsData.map((client) =>
       client.id === editClient.id
         ? {
@@ -115,21 +260,23 @@ export function ClientsList({ data = [] }: ClientsListProps) {
             ...editClient,
             birthDate: new Date(editClient.birthDate),
           }
-        : client,
+        : client
     )
 
     setClientsData(updatedClients)
     setSuccess(`Le client ${editClient.name} a été mis à jour avec succès.`)
     setEditDialog(false)
 
-    // Réinitialiser le message après 3 secondes
+    // Reset the message after 3 seconds
     setTimeout(() => {
       setSuccess("")
     }, 3000)
-  }
+  }, [clientsData, editClient]);
 
-  const handleDeleteClient = () => {
-    // Supprimer le client
+  const handleDeleteClient = useCallback(() => {
+    // Delete the client
+    if (!selectedClient) return;
+    
     const updatedClients = clientsData.filter((client) => client.id !== selectedClient.id)
 
     setClientsData(updatedClients)
@@ -137,13 +284,13 @@ export function ClientsList({ data = [] }: ClientsListProps) {
     setDeleteDialog(false)
     setSelectedClient(null)
 
-    // Réinitialiser le message après 3 secondes
+    // Reset the message after 3 seconds
     setTimeout(() => {
       setSuccess("")
     }, 3000)
-  }
+  }, [clientsData, selectedClient]);
 
-  const openEditDialog = (client: any) => {
+  const openEditDialog = useCallback((client: any) => {
     setEditClient({
       id: client.id,
       name: client.name,
@@ -154,21 +301,25 @@ export function ClientsList({ data = [] }: ClientsListProps) {
       status: client.status,
     })
     setEditDialog(true)
-  }
+  }, []);
 
-  const openDeleteDialog = (client: any) => {
+  const openDeleteDialog = useCallback((client: any) => {
     setSelectedClient(client)
     setDeleteDialog(true)
-  }
+  }, []);
 
-  const openViewDialog = (client: any) => {
+  const openViewDialog = useCallback((client: any) => {
     setSelectedClient(client)
     setViewDialog(true)
-  }
+  }, []);
 
-  // Formater la date pour l'input type="date"
-  const formatDateForInput = (date: Date) => {
+  // Format the date for the input type="date"
+  const formatDateForInput = useCallback((date: Date) => {
+    if (!date) return '';
+    
     const d = new Date(date)
+    if (isNaN(d.getTime())) return '';
+    
     let month = "" + (d.getMonth() + 1)
     let day = "" + d.getDate()
     const year = d.getFullYear()
@@ -177,6 +328,27 @@ export function ClientsList({ data = [] }: ClientsListProps) {
     if (day.length < 2) day = "0" + day
 
     return [year, month, day].join("-")
+  }, []);
+
+  // Format date for display
+  function formatDate(date: Date | string): string {
+    if (!date) return '';
+    
+    try {
+      // Convert string to Date if necessary
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      
+      // Check if date is valid
+      if (isNaN(dateObj.getTime())) {
+        console.warn('Invalid date:', date);
+        return String(date);
+      }
+      
+      return dateObj.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+    } catch (err) {
+      console.error('Error formatting date:', date, err);
+      return String(date);
+    }
   }
 
   return (
@@ -208,7 +380,7 @@ export function ClientsList({ data = [] }: ClientsListProps) {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader className="bg-gradient-to-r from-teal-500 via-blue-500 to-indigo-500 p-6 rounded-t-xl text-white relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-15 bg-center"></div>
+                  <div className="absolute inset-0 opacity-15 bg-center"></div>
                   <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-white/10 blur-3xl animate-pulse"></div>
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-200 via-white/20 to-cyan-200 opacity-30"></div>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-x"></div>
@@ -340,7 +512,7 @@ export function ClientsList({ data = [] }: ClientsListProps) {
                 <TableRow key={client.id} className="hover:bg-gray-50 transition-colors">
                   <TableCell>
                     <Avatar className="border-2 border-gray-200">
-                      <AvatarImage src={client.avatar || "/placeholder.svg"} alt={client.name} />
+                      <AvatarImage src="/images/placeholder-avatar.png" alt={client.name} />
                       <AvatarFallback className="bg-pharma-primary/10 text-pharma-primary font-semibold">
                         {getInitials(client.name)}
                       </AvatarFallback>
@@ -711,92 +883,6 @@ export function ClientsList({ data = [] }: ClientsListProps) {
       </Dialog>
     </Card>
   )
-}
-
-// Données fictives pour les clients marocains
-const clients = [
-  {
-    id: 1,
-    name: "Mohammed Alami",
-    email: "mohammed.alami@gmail.com",
-    phone: "06 12 34 56 78",
-    birthDate: new Date(1975, 5, 15),
-    lastVisit: new Date(2024, 3, 10),
-    status: "régulier",
-    hasPrescription: true,
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 2,
-    name: "Fatima Benali",
-    email: "fatima.benali@gmail.com",
-    phone: "06 23 45 67 89",
-    birthDate: new Date(1982, 8, 22),
-    lastVisit: new Date(2024, 3, 15),
-    status: "régulier",
-    hasPrescription: false,
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 3,
-    name: "Youssef Mansouri",
-    email: "youssef.mansouri@gmail.com",
-    phone: "06 34 56 78 90",
-    birthDate: new Date(1968, 2, 10),
-    lastVisit: new Date(2024, 2, 28),
-    status: "occasionnel",
-    hasPrescription: true,
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 4,
-    name: "Amina Tazi",
-    email: "amina.tazi@gmail.com",
-    phone: "06 45 67 89 01",
-    birthDate: new Date(1990, 11, 5),
-    lastVisit: new Date(2024, 3, 18),
-    status: "nouveau",
-    hasPrescription: true,
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 5,
-    name: "Karim Idrissi",
-    email: "karim.idrissi@gmail.com",
-    phone: "06 56 78 90 12",
-    birthDate: new Date(1985, 7, 30),
-    lastVisit: new Date(2024, 3, 5),
-    status: "régulier",
-    hasPrescription: false,
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 6,
-    name: "Nadia Chraibi",
-    email: "nadia.chraibi@gmail.com",
-    phone: "06 67 89 01 23",
-    birthDate: new Date(1995, 4, 12),
-    lastVisit: new Date(2024, 3, 20),
-    status: "nouveau",
-    hasPrescription: false,
-    avatar: "/placeholder-user.jpg",
-  },
-  {
-    id: 7,
-    name: "Hassan Benjelloun",
-    email: "hassan.benjelloun@gmail.com",
-    phone: "06 78 90 12 34",
-    birthDate: new Date(1972, 9, 8),
-    lastVisit: new Date(2024, 3, 1),
-    status: "régulier",
-    hasPrescription: true,
-    avatar: "/placeholder-user.jpg",
-  },
-]
-
-// Fonction pour formater la date
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })
 }
 
 // Fonction pour obtenir les initiales d'un nom

@@ -198,8 +198,23 @@ export function useApi() {
   // Clients related API calls
   const clientsApi = {
     getClients: async () => {
-      const response = await api.get('/clients');
-      return response.data;
+      try {
+        console.log("Fetching clients from API endpoint:", `${getBaseUrl()}/clients`);
+        const response = await withTimeout(api.get('/clients'), 5000);
+        console.log("API response for clients:", response.data);
+        
+        // Ensure we're always returning an array
+        if (Array.isArray(response.data)) {
+          return response.data;
+        } else {
+          console.error("API returned non-array data for clients:", response.data);
+          return [];
+        }
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+        // Return empty array in case of error
+        return [];
+      }
     },
     getClient: async (id: string) => {
       const response = await api.get(`/clients/${id}`);

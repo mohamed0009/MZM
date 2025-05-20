@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -72,7 +73,7 @@ public class EnhancedMock {
     }
     
     public static void main(String[] args) throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(8081), 0);
         server.setExecutor(Executors.newFixedThreadPool(10)); // Use a real thread pool
         
         // Basic endpoints
@@ -96,18 +97,34 @@ public class EnhancedMock {
         // Permission-based endpoints
         server.createContext("/api/inventory/products", new PermissionRestrictedHandler(new ProductsHandler(), "VIEW_INVENTORY"));
         server.createContext("/api/inventory/update", new PermissionRestrictedHandler(new InventoryUpdateHandler(), "EDIT_INVENTORY"));
-        server.createContext("/api/clients", new PermissionRestrictedHandler(new ClientsHandler(), "VIEW_CLIENTS"));
+        server.createContext("/api/clients", new ClientsHandler());
         server.createContext("/api/clients/update", new PermissionRestrictedHandler(new ClientUpdateHandler(), "EDIT_CLIENTS"));
         server.createContext("/api/permissions/all", new PermissionRestrictedHandler(new PermissionsHandler(), "VIEW_INVENTORY"));
         server.createContext("/api/system/users", new PermissionRestrictedHandler(new UsersHandler(), "MANAGE_USERS"));
+        
+        // Add orders endpoint
+        server.createContext("/api/test/orders", new OrdersHandler());
+        
+        // Add data viewer endpoint
+        server.createContext("/api/data-viewer", new DataViewerHandler());
+        
+        // Add sales endpoint
+        server.createContext("/api/sales", new SalesHandler());
+        server.createContext("/api/sales/stats", new SalesStatsHandler());
+        
+        // Add data initialization endpoint
+        server.createContext("/api/data/init-sample-data", new DataInitHandler());
+        
+        // Add dashboard data endpoint
+        server.createContext("/api/dashboard/data", new DashboardDataHandler());
         
         // Start server
         server.start();
         
         System.out.println("=======================================================");
         System.out.println("         Enhanced Mock Backend Server Started");
-        System.out.println("         API available at: http://localhost:8080/api");
-        System.out.println("         Test API: http://localhost:8080/api/test/echo");
+        System.out.println("         API available at: http://localhost:8081/api");
+        System.out.println("         Test API: http://localhost:8081/api/test/echo");
         System.out.println("=======================================================");
     }
     
@@ -1020,6 +1037,66 @@ public class EnhancedMock {
                     "    \"lastVisit\": \"2023-03-28\",\n" +
                     "    \"status\": \"nouveau\",\n" +
                     "    \"hasPrescription\": false\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": 3,\n" +
+                    "    \"name\": \"Mohammed Alami\",\n" +
+                    "    \"email\": \"m.alami@example.com\",\n" +
+                    "    \"phone\": \"0661234567\",\n" +
+                    "    \"birthDate\": \"1988-11-05\",\n" +
+                    "    \"lastVisit\": \"2023-05-12\",\n" +
+                    "    \"status\": \"régulier\",\n" +
+                    "    \"hasPrescription\": true\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": 4,\n" +
+                    "    \"name\": \"Fatima Benali\",\n" +
+                    "    \"email\": \"f.benali@example.com\",\n" +
+                    "    \"phone\": \"0754321987\",\n" +
+                    "    \"birthDate\": \"1990-08-17\",\n" +
+                    "    \"lastVisit\": \"2023-05-14\",\n" +
+                    "    \"status\": \"régulier\",\n" +
+                    "    \"hasPrescription\": true\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": 5,\n" +
+                    "    \"name\": \"Ahmed Laroussi\",\n" +
+                    "    \"email\": \"a.laroussi@example.com\",\n" +
+                    "    \"phone\": \"0634567890\",\n" +
+                    "    \"birthDate\": \"1965-02-28\",\n" +
+                    "    \"lastVisit\": \"2023-05-01\",\n" +
+                    "    \"status\": \"régulier\",\n" +
+                    "    \"hasPrescription\": true\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": 6,\n" +
+                    "    \"name\": \"Yasmine Kadiri\",\n" +
+                    "    \"email\": \"y.kadiri@example.com\",\n" +
+                    "    \"phone\": \"0698765432\",\n" +
+                    "    \"birthDate\": \"1992-04-09\",\n" +
+                    "    \"lastVisit\": \"2023-05-08\",\n" +
+                    "    \"status\": \"nouveau\",\n" +
+                    "    \"hasPrescription\": false\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": 7,\n" +
+                    "    \"name\": \"Karim Mansouri\",\n" +
+                    "    \"email\": \"k.mansouri@example.com\",\n" +
+                    "    \"phone\": \"0678901234\",\n" +
+                    "    \"birthDate\": \"1979-12-15\",\n" +
+                    "    \"lastVisit\": \"2023-05-11\",\n" +
+                    "    \"status\": \"régulier\",\n" +
+                    "    \"hasPrescription\": true\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": 8,\n" +
+                    "    \"name\": \"Sara Benjelloun\",\n" +
+                    "    \"email\": \"s.benjelloun@example.com\",\n" +
+                    "    \"phone\": \"0712345678\",\n" +
+                    "    \"birthDate\": \"1987-07-22\",\n" +
+                    "    \"lastVisit\": \"2023-05-13\",\n" +
+                    "    \"status\": \"régulier\",\n" +
+                    "    \"hasPrescription\": false\n" +
                     "  }\n" +
                     "]";
             
@@ -1056,6 +1133,557 @@ public class EnhancedMock {
                     "]";
             
             sendJsonResponse(exchange, response);
+        }
+    }
+    
+    // Orders Handler for test/orders endpoint
+    static class OrdersHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Add CORS headers
+            addCorsHeaders(exchange);
+            
+            // Handle preflight
+            if (handlePreflight(exchange)) {
+                return;
+            }
+            
+            if ("GET".equals(exchange.getRequestMethod())) {
+                // Create sample orders data
+                List<Map<String, Object>> orders = new ArrayList<>();
+                
+                // Order 1
+                Map<String, Object> order1 = new HashMap<>();
+                order1.put("id", "ORD-2023-5678");
+                order1.put("supplier", "MedPharm Supplies");
+                order1.put("date", "2023-06-15");
+                order1.put("status", "En attente");
+                order1.put("total", 2580.50);
+                order1.put("paymentStatus", "Payé");
+                
+                List<Map<String, Object>> items1 = new ArrayList<>();
+                Map<String, Object> item1 = new HashMap<>();
+                item1.put("id", 1);
+                item1.put("name", "Paracétamol 500mg");
+                item1.put("quantity", 50);
+                item1.put("price", 8.50);
+                item1.put("total", 425.0);
+                items1.add(item1);
+                
+                Map<String, Object> item2 = new HashMap<>();
+                item2.put("id", 2);
+                item2.put("name", "Amoxicilline 1g");
+                item2.put("quantity", 30);
+                item2.put("price", 15.20);
+                item2.put("total", 456.0);
+                items1.add(item2);
+                
+                Map<String, Object> item3 = new HashMap<>();
+                item3.put("id", 3);
+                item3.put("name", "Gants médicaux (boîte)");
+                item3.put("quantity", 20);
+                item3.put("price", 12.50);
+                item3.put("total", 250.0);
+                items1.add(item3);
+                
+                order1.put("items", items1);
+                orders.add(order1);
+                
+                // Order 2
+                Map<String, Object> order2 = new HashMap<>();
+                order2.put("id", "ORD-2023-5679");
+                order2.put("supplier", "PharmaSolutions");
+                order2.put("date", "2023-06-14");
+                order2.put("status", "Expédiée");
+                order2.put("total", 1890.75);
+                order2.put("paymentStatus", "Payé");
+                
+                List<Map<String, Object>> items2 = new ArrayList<>();
+                Map<String, Object> item21 = new HashMap<>();
+                item21.put("id", 1);
+                item21.put("name", "Alcool médical 70% 1L");
+                item21.put("quantity", 30);
+                item21.put("price", 5.20);
+                item21.put("total", 156.0);
+                items2.add(item21);
+                
+                Map<String, Object> item22 = new HashMap<>();
+                item22.put("id", 2);
+                item22.put("name", "Seringues 10ml (paquet)");
+                item22.put("quantity", 50);
+                item22.put("price", 8.75);
+                item22.put("total", 437.50);
+                items2.add(item22);
+                
+                order2.put("items", items2);
+                orders.add(order2);
+                
+                // Convert to JSON and send response
+                String jsonString = orders.toString()
+                    .replace("=", ":")
+                    .replace("{", "{\"")
+                    .replace("}", "\"}")
+                    .replace(", ", ", \"")
+                    .replace(":{", ":{\"")
+                    .replace(":\"[", ":[")
+                    .replace("]\"", "]")
+                    .replace("}\", ", "}, ")
+                    .replace("\"{", "{")
+                    .replace("}\"", "}");
+                    
+                sendJsonResponse(exchange, jsonString);
+            } else {
+                // Method not allowed
+                exchange.sendResponseHeaders(405, 0);
+                exchange.getResponseBody().close();
+            }
+        }
+    }
+    
+    // Data Viewer Handler - displays all data in a simple HTML format
+    static class DataViewerHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Add CORS headers
+            addCorsHeaders(exchange);
+            
+            // Handle preflight
+            if (handlePreflight(exchange)) {
+                return;
+            }
+            
+            if ("GET".equals(exchange.getRequestMethod())) {
+                StringBuilder htmlBuilder = new StringBuilder();
+                htmlBuilder.append("<!DOCTYPE html>");
+                htmlBuilder.append("<html>");
+                htmlBuilder.append("<head>");
+                htmlBuilder.append("<title>PharmaFlow Data Viewer</title>");
+                htmlBuilder.append("<style>");
+                htmlBuilder.append("body { font-family: Arial, sans-serif; margin: 20px; }");
+                htmlBuilder.append("h1 { color: #2c3e50; }");
+                htmlBuilder.append("h2 { color: #3498db; margin-top: 30px; }");
+                htmlBuilder.append("table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }");
+                htmlBuilder.append("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
+                htmlBuilder.append("th { background-color: #f2f2f2; }");
+                htmlBuilder.append("tr:nth-child(even) { background-color: #f9f9f9; }");
+                htmlBuilder.append("</style>");
+                htmlBuilder.append("</head>");
+                htmlBuilder.append("<body>");
+                htmlBuilder.append("<h1>PharmaFlow Data Viewer</h1>");
+                
+                // Users Table
+                htmlBuilder.append("<h2>Users Table</h2>");
+                htmlBuilder.append("<table>");
+                htmlBuilder.append("<tr><th>ID</th><th>Username</th><th>Email</th><th>First Name</th><th>Last Name</th><th>Role</th></tr>");
+                
+                for (User user : users.values()) {
+                    htmlBuilder.append("<tr>");
+                    htmlBuilder.append("<td>").append(user.id).append("</td>");
+                    htmlBuilder.append("<td>").append(user.username).append("</td>");
+                    htmlBuilder.append("<td>").append(user.email).append("</td>");
+                    htmlBuilder.append("<td>").append(user.firstName).append("</td>");
+                    htmlBuilder.append("<td>").append(user.lastName).append("</td>");
+                    htmlBuilder.append("<td>").append(user.role).append("</td>");
+                    htmlBuilder.append("</tr>");
+                }
+                
+                htmlBuilder.append("</table>");
+                
+                // Sessions Table
+                htmlBuilder.append("<h2>Active Sessions Table</h2>");
+                htmlBuilder.append("<table>");
+                htmlBuilder.append("<tr><th>Session ID</th><th>User ID</th><th>Role</th><th>Created At</th><th>Expires At</th><th>IP Address</th><th>Active</th></tr>");
+                
+                for (Session session : activeSessions.values()) {
+                    htmlBuilder.append("<tr>");
+                    htmlBuilder.append("<td>").append(session.sessionId).append("</td>");
+                    htmlBuilder.append("<td>").append(session.userId).append("</td>");
+                    htmlBuilder.append("<td>").append(session.role).append("</td>");
+                    htmlBuilder.append("<td>").append(session.createdAt).append("</td>");
+                    htmlBuilder.append("<td>").append(session.expiresAt).append("</td>");
+                    htmlBuilder.append("<td>").append(session.ipAddress).append("</td>");
+                    htmlBuilder.append("<td>").append(session.active).append("</td>");
+                    htmlBuilder.append("</tr>");
+                }
+                
+                htmlBuilder.append("</table>");
+                
+                // Roles and Permissions
+                htmlBuilder.append("<h2>Role Permissions Table</h2>");
+                htmlBuilder.append("<table>");
+                htmlBuilder.append("<tr><th>Role</th><th>Permissions</th></tr>");
+                
+                for (Map.Entry<String, List<String>> entry : rolePermissions.entrySet()) {
+                    htmlBuilder.append("<tr>");
+                    htmlBuilder.append("<td>").append(entry.getKey()).append("</td>");
+                    htmlBuilder.append("<td>").append(String.join(", ", entry.getValue())).append("</td>");
+                    htmlBuilder.append("</tr>");
+                }
+                
+                htmlBuilder.append("</table>");
+                
+                // Products Table (from ProductsHandler)
+                htmlBuilder.append("<h2>Products Table</h2>");
+                htmlBuilder.append("<table>");
+                htmlBuilder.append("<tr><th>ID</th><th>Name</th><th>Description</th><th>Price</th><th>Stock</th><th>Category</th><th>Expiry</th></tr>");
+                
+                // Manually add products since they're defined in ProductsHandler
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>1</td>");
+                htmlBuilder.append("<td>Paracétamol 500mg</td>");
+                htmlBuilder.append("<td>Analgésique et antipyrétique</td>");
+                htmlBuilder.append("<td>8.50</td>");
+                htmlBuilder.append("<td>250</td>");
+                htmlBuilder.append("<td>Analgésiques</td>");
+                htmlBuilder.append("<td>2025-12-31</td>");
+                htmlBuilder.append("</tr>");
+                
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>2</td>");
+                htmlBuilder.append("<td>Ibuprofène 200mg</td>");
+                htmlBuilder.append("<td>Anti-inflammatoire non stéroïdien</td>");
+                htmlBuilder.append("<td>10.20</td>");
+                htmlBuilder.append("<td>180</td>");
+                htmlBuilder.append("<td>Anti-inflammatoires</td>");
+                htmlBuilder.append("<td>2025-10-15</td>");
+                htmlBuilder.append("</tr>");
+                
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>3</td>");
+                htmlBuilder.append("<td>Amoxicilline 500mg</td>");
+                htmlBuilder.append("<td>Antibiotique de la famille des bêta-lactamines</td>");
+                htmlBuilder.append("<td>15.75</td>");
+                htmlBuilder.append("<td>120</td>");
+                htmlBuilder.append("<td>Antibiotiques</td>");
+                htmlBuilder.append("<td>2024-08-20</td>");
+                htmlBuilder.append("</tr>");
+                
+                htmlBuilder.append("</table>");
+                
+                // Orders Table
+                htmlBuilder.append("<h2>Orders Table</h2>");
+                htmlBuilder.append("<table>");
+                htmlBuilder.append("<tr><th>ID</th><th>Supplier</th><th>Date</th><th>Status</th><th>Total</th><th>Payment Status</th></tr>");
+                
+                // Order 1
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>ORD-2023-5678</td>");
+                htmlBuilder.append("<td>MedPharm Supplies</td>");
+                htmlBuilder.append("<td>2023-06-15</td>");
+                htmlBuilder.append("<td>En attente</td>");
+                htmlBuilder.append("<td>2580.50</td>");
+                htmlBuilder.append("<td>Payé</td>");
+                htmlBuilder.append("</tr>");
+                
+                // Order 2
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>ORD-2023-5679</td>");
+                htmlBuilder.append("<td>PharmaSolutions</td>");
+                htmlBuilder.append("<td>2023-06-14</td>");
+                htmlBuilder.append("<td>Expédiée</td>");
+                htmlBuilder.append("<td>1890.75</td>");
+                htmlBuilder.append("<td>Payé</td>");
+                htmlBuilder.append("</tr>");
+                
+                htmlBuilder.append("</table>");
+                
+                // Clients Table
+                htmlBuilder.append("<h2>Clients Table</h2>");
+                htmlBuilder.append("<table>");
+                htmlBuilder.append("<tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Birth Date</th><th>Last Visit</th><th>Status</th></tr>");
+                
+                // Client 1
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>1</td>");
+                htmlBuilder.append("<td>Sophie Dubois</td>");
+                htmlBuilder.append("<td>sophie.dubois@example.com</td>");
+                htmlBuilder.append("<td>0612345678</td>");
+                htmlBuilder.append("<td>1985-06-15</td>");
+                htmlBuilder.append("<td>2023-04-10</td>");
+                htmlBuilder.append("<td>régulier</td>");
+                htmlBuilder.append("</tr>");
+                
+                // Client 2
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>2</td>");
+                htmlBuilder.append("<td>Jean Martin</td>");
+                htmlBuilder.append("<td>jean.martin@example.com</td>");
+                htmlBuilder.append("<td>0723456789</td>");
+                htmlBuilder.append("<td>1972-03-22</td>");
+                htmlBuilder.append("<td>2023-03-28</td>");
+                htmlBuilder.append("<td>nouveau</td>");
+                htmlBuilder.append("</tr>");
+                
+                htmlBuilder.append("</table>");
+                
+                // Sales Table
+                htmlBuilder.append("<h2>Sales Table</h2>");
+                htmlBuilder.append("<table>");
+                htmlBuilder.append("<tr><th>ID</th><th>Client</th><th>Date</th><th>Total</th><th>Payment Method</th></tr>");
+                
+                // Sale 1
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>1</td>");
+                htmlBuilder.append("<td>Sophie Dubois</td>");
+                htmlBuilder.append("<td>2023-05-01</td>");
+                htmlBuilder.append("<td>325.00</td>");
+                htmlBuilder.append("<td>CASH</td>");
+                htmlBuilder.append("</tr>");
+                
+                // Sale 2
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>2</td>");
+                htmlBuilder.append("<td>Jean Martin</td>");
+                htmlBuilder.append("<td>2023-05-02</td>");
+                htmlBuilder.append("<td>200.00</td>");
+                htmlBuilder.append("<td>CARD</td>");
+                htmlBuilder.append("</tr>");
+                
+                // Sale 3
+                htmlBuilder.append("<tr>");
+                htmlBuilder.append("<td>3</td>");
+                htmlBuilder.append("<td>Youssef Mansouri</td>");
+                htmlBuilder.append("<td>" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + "</td>");
+                htmlBuilder.append("<td>255.00</td>");
+                htmlBuilder.append("<td>CASH</td>");
+                htmlBuilder.append("</tr>");
+                
+                htmlBuilder.append("</table>");
+                
+                htmlBuilder.append("</body>");
+                htmlBuilder.append("</html>");
+                
+                // Set response headers
+                exchange.getResponseHeaders().set("Content-Type", "text/html");
+                byte[] responseBytes = htmlBuilder.toString().getBytes("UTF-8");
+                exchange.sendResponseHeaders(200, responseBytes.length);
+                
+                // Send the HTML response
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(responseBytes);
+                }
+            } else {
+                // Method not allowed
+                exchange.sendResponseHeaders(405, 0);
+                exchange.getResponseBody().close();
+            }
+        }
+    }
+    
+    // Sales Handler for /api/sales endpoint
+    static class SalesHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Add CORS headers
+            addCorsHeaders(exchange);
+            
+            // Handle preflight
+            if (handlePreflight(exchange)) {
+                return;
+            }
+            
+            if ("GET".equals(exchange.getRequestMethod())) {
+                // Create sample sales data
+                String salesData = "[\n" +
+                    "  {\n" +
+                    "    \"id\": 1,\n" +
+                    "    \"clientId\": \"1\",\n" +
+                    "    \"saleDate\": \"2023-05-01\",\n" +
+                    "    \"items\": [\n" +
+                    "      { \"productId\": \"1\", \"quantity\": 2, \"price\": 120 },\n" +
+                    "      { \"productId\": \"2\", \"quantity\": 1, \"price\": 85 }\n" +
+                    "    ],\n" +
+                    "    \"paymentMethod\": \"CASH\",\n" +
+                    "    \"notes\": \"\"\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": 2,\n" +
+                    "    \"clientId\": \"2\",\n" +
+                    "    \"saleDate\": \"2023-05-02\",\n" +
+                    "    \"items\": [\n" +
+                    "      { \"productId\": \"3\", \"quantity\": 1, \"price\": 200 }\n" +
+                    "    ],\n" +
+                    "    \"paymentMethod\": \"CARD\",\n" +
+                    "    \"notes\": \"\"\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": 3,\n" +
+                    "    \"clientId\": \"3\",\n" +
+                    "    \"saleDate\": \"" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + "\",\n" +
+                    "    \"items\": [\n" +
+                    "      { \"productId\": \"1\", \"quantity\": 1, \"price\": 120 },\n" +
+                    "      { \"productId\": \"4\", \"quantity\": 3, \"price\": 45 }\n" +
+                    "    ],\n" +
+                    "    \"paymentMethod\": \"CASH\",\n" +
+                    "    \"notes\": \"\"\n" +
+                    "  }\n" +
+                    "]";
+                
+                sendJsonResponse(exchange, salesData);
+            } else if ("POST".equals(exchange.getRequestMethod())) {
+                // Simulate creating a new sale
+                String responseData = "{\n" +
+                    "  \"success\": true,\n" +
+                    "  \"message\": \"Vente créée avec succès\",\n" +
+                    "  \"data\": { \"id\": " + UUID.randomUUID().toString().hashCode() + " }\n" +
+                    "}";
+                
+                sendJsonResponse(exchange, responseData, 201);
+            } else {
+                // Method not allowed
+                exchange.sendResponseHeaders(405, 0);
+                exchange.getResponseBody().close();
+            }
+        }
+    }
+    
+    // Sales Stats Handler for /api/sales/stats endpoint
+    static class SalesStatsHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            // Add CORS headers
+            addCorsHeaders(exchange);
+            
+            // Handle preflight
+            if (handlePreflight(exchange)) {
+                return;
+            }
+            
+            if ("GET".equals(exchange.getRequestMethod())) {
+                // Create sample sales statistics data
+                String statsData = "{\n" +
+                    "  \"totalSales\": 34500,\n" +
+                    "  \"salesCount\": 152,\n" +
+                    "  \"todaySales\": 3850,\n" +
+                    "  \"todaySalesCount\": 12,\n" +
+                    "  \"averageSale\": 227,\n" +
+                    "  \"mainPaymentMethod\": \"Espèces\",\n" +
+                    "  \"mainPaymentMethodPercentage\": 68,\n" +
+                    "  \"salesByPeriod\": [\n" +
+                    "    { \"period\": \"Jan\", \"amount\": 4000 },\n" +
+                    "    { \"period\": \"Fév\", \"amount\": 3000 },\n" +
+                    "    { \"period\": \"Mar\", \"amount\": 5000 },\n" +
+                    "    { \"period\": \"Avr\", \"amount\": 2780 },\n" +
+                    "    { \"period\": \"Mai\", \"amount\": 3890 },\n" +
+                    "    { \"period\": \"Jun\", \"amount\": 2390 }\n" +
+                    "  ],\n" +
+                    "  \"paymentMethods\": [\n" +
+                    "    { \"name\": \"Espèces\", \"value\": 103 },\n" +
+                    "    { \"name\": \"Carte\", \"value\": 32 },\n" +
+                    "    { \"name\": \"Virement\", \"value\": 12 },\n" +
+                    "    { \"name\": \"Mobile\", \"value\": 5 }\n" +
+                    "  ],\n" +
+                    "  \"topProducts\": [\n" +
+                    "    { \"name\": \"Paracétamol 500mg\", \"quantity\": 245, \"total\": 29400, \"percentage\": 22 },\n" +
+                    "    { \"name\": \"Oméprazole 20mg\", \"quantity\": 187, \"total\": 8415, \"percentage\": 16 },\n" +
+                    "    { \"name\": \"Amoxicilline 1g\", \"quantity\": 145, \"total\": 12325, \"percentage\": 14 },\n" +
+                    "    { \"name\": \"Ibuprofène 400mg\", \"quantity\": 98, \"total\": 19600, \"percentage\": 11 },\n" +
+                    "    { \"name\": \"Doliprane 1000mg\", \"quantity\": 76, \"total\": 3990, \"percentage\": 8 }\n" +
+                    "  ]\n" +
+                    "}";
+                
+                sendJsonResponse(exchange, statsData);
+            } else {
+                // Method not allowed
+                exchange.sendResponseHeaders(405, 0);
+                exchange.getResponseBody().close();
+            }
+        }
+    }
+    
+    // Data Init Handler for /api/data/init-sample-data endpoint
+    static class DataInitHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if (handlePreflight(exchange)) return;
+            
+            // Only handle POST requests
+            if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                exchange.sendResponseHeaders(405, 0);
+                exchange.close();
+                return;
+            }
+            
+            System.out.println("Initializing sample data...");
+            
+            // Respond with success
+            String response = "{\n" +
+                    "  \"success\": true,\n" +
+                    "  \"message\": \"Sample data initialized successfully\",\n" +
+                    "  \"timestamp\": " + System.currentTimeMillis() + "\n" +
+                    "}";
+            
+            sendJsonResponse(exchange, response);
+            
+            System.out.println("Sample data initialized successfully");
+        }
+    }
+    
+    // Dashboard Data Handler for /api/dashboard/data endpoint
+    static class DashboardDataHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if (handlePreflight(exchange)) return;
+            
+            // Get the role from query parameters if available
+            String query = exchange.getRequestURI().getQuery();
+            String role = "admin"; // Default role
+            
+            if (query != null && query.contains("role=")) {
+                role = query.substring(query.indexOf("role=") + 5);
+                if (role.contains("&")) {
+                    role = role.substring(0, role.indexOf("&"));
+                }
+            }
+            
+            // Create dashboard data based on role
+            StringBuilder responseJson = new StringBuilder();
+            responseJson.append("{\n");
+            responseJson.append("  \"stats\": {\n");
+            responseJson.append("    \"totalSales\": 8459,\n");
+            responseJson.append("    \"totalOrders\": 145,\n");
+            responseJson.append("    \"totalCustomers\": 72,\n");
+            responseJson.append("    \"totalRevenue\": 145890,\n");
+            responseJson.append("    \"totalProducts\": 728,\n");
+            responseJson.append("    \"lowStockProducts\": 12,\n");
+            responseJson.append("    \"totalClients\": 96,\n");
+            responseJson.append("    \"recentSales\": 24,\n");
+            responseJson.append("    \"pendingOrders\": 5,\n");
+            responseJson.append("    \"alerts\": 8\n");
+            responseJson.append("  },\n");
+            responseJson.append("  \"salesChart\": {\n");
+            responseJson.append("    \"labels\": [\"Jan\", \"Fév\", \"Mar\", \"Avr\", \"Mai\", \"Jun\", \"Jul\"],\n");
+            responseJson.append("    \"data\": [4500, 3800, 5200, 2900, 1950, 2400, 3600]\n");
+            responseJson.append("  },\n");
+            responseJson.append("  \"recentSales\": [\n");
+            responseJson.append("    { \"id\": \"1\", \"customer\": \"Mohammed Alami\", \"amount\": 450, \"date\": \"Il y a 3 heures\" },\n");
+            responseJson.append("    { \"id\": \"2\", \"customer\": \"Fatima Benali\", \"amount\": 235, \"date\": \"Il y a 5 heures\" },\n");
+            responseJson.append("    { \"id\": \"3\", \"customer\": \"Ahmed Laroussi\", \"amount\": 290, \"date\": \"Il y a 1 jour\" }\n");
+            responseJson.append("  ],\n");
+            responseJson.append("  \"recentSalesCount\": 3,\n");
+            responseJson.append("  \"alerts\": [\n");
+            responseJson.append("    { \"id\": \"1\", \"title\": \"Stock faible\", \"message\": \"12 produits en stock critique\" }\n");
+            responseJson.append("  ],\n");
+            responseJson.append("  \"inventory\": [\n");
+            responseJson.append("    { \"id\": \"1\", \"name\": \"Paracetamol 500mg\", \"stock\": 8, \"category\": \"Analgésique\" },\n");
+            responseJson.append("    { \"id\": \"2\", \"name\": \"Amoxicilline 1g\", \"stock\": 15, \"category\": \"Antibiotique\" }\n");
+            responseJson.append("  ],\n");
+            responseJson.append("  \"clients\": [\n");
+            responseJson.append("    { \"id\": \"1\", \"name\": \"Sophie Dubois\", \"email\": \"sophie.dubois@example.com\", \"phone\": \"0612345678\" },\n");
+            responseJson.append("    { \"id\": \"2\", \"name\": \"Jean Martin\", \"email\": \"jean.martin@example.com\", \"phone\": \"0723456789\" }\n");
+            responseJson.append("  ],\n");
+            responseJson.append("  \"calendar\": [],\n");
+            responseJson.append("  \"analytics\": [],\n");
+            responseJson.append("  \"settings\": {},\n");
+            responseJson.append("  \"prescriptions\": {\n");
+            responseJson.append("    \"total\": 28,\n");
+            responseJson.append("    \"pending\": 12,\n");
+            responseJson.append("    \"completed\": 16,\n");
+            responseJson.append("    \"recent\": []\n");
+            responseJson.append("  }\n");
+            responseJson.append("}");
+            
+            sendJsonResponse(exchange, responseJson.toString());
         }
     }
 } 

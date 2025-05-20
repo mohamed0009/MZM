@@ -214,6 +214,7 @@ export default function OrdersPage() {
   const [newOrderDialogOpen, setNewOrderDialogOpen] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const orderDetailRef = useRef<HTMLDivElement>(null);
+  const [clients, setClients] = useState<any[]>([]);
   
   // Function to handle order status changes
   const updateOrderStatus = useCallback((orderId: string, newStatus: string) => {
@@ -373,7 +374,7 @@ export default function OrdersPage() {
           </div>
           
             <div className="flex items-center gap-2 w-full md:w-auto">
-            {hasPermission("manage_inventory") && (
+            {hasPermission("orders:create") && (
                 <Button 
                   className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border border-white/30 shadow-sm"
                   onClick={() => setNewOrderDialogOpen(true)}
@@ -1193,11 +1194,19 @@ export default function OrdersPage() {
                       <SelectValue placeholder="Sélectionner un fournisseur" />
                     </SelectTrigger>
                     <SelectContent>
+                      {Array.isArray(clients) ? clients.map((client) => (
+                        <SelectItem key={client.id} value={client.id}>
+                          {client.name}
+                        </SelectItem>
+                      )) : (
+                        <>
                       <SelectItem value="medpharm">MedPharm Supplies</SelectItem>
                       <SelectItem value="pharmasol">PharmaSolutions</SelectItem>
                       <SelectItem value="biomed">BioMed Distributors</SelectItem>
                       <SelectItem value="globalmed">GlobalMed Inc.</SelectItem>
                       <SelectItem value="pharmatech">PharmaTech</SelectItem>
+                        </>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>

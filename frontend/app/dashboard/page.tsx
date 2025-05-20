@@ -25,7 +25,6 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import ECGAnimation from "@/components/ECGAnimation"
-import ConnectionTest from "@/components/ConnectionTest"
 
 // Updated API response type matching server structure
 interface DashboardResponse {
@@ -292,18 +291,6 @@ export default function DashboardPage() {
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-7xl">
       <div className="flex flex-col gap-6">
-        {/* Connection Test Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="mb-8"
-        >
-          <ConnectionTest 
-            onInitialize={() => refetch()}
-          />
-        </motion.div>
-        
         {/* Header with gradient background */}
         <motion.div 
           className="bg-gradient-to-r from-teal-500 via-blue-500 to-indigo-500 rounded-2xl p-6 shadow-xl text-white mb-2 relative overflow-hidden"

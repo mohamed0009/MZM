@@ -141,7 +141,7 @@ export default function SalesPage() {
     })
   }
 
-  const filteredSales = sales
+  const filteredSales = Array.isArray(sales) ? sales
     .filter(sale => {
       // Filtrer par période
       if (periodFilter === "today") {
@@ -168,7 +168,7 @@ export default function SalesPage() {
       return sale.id.toString().includes(query) || 
              (client && client.name.toLowerCase().includes(query)) ||
              sale.paymentMethod.toLowerCase().includes(query)
-    })
+    }) : [];
   
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-7xl">

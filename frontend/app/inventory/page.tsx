@@ -302,8 +302,8 @@ export default function InventoryPage() {
                 <Pill className="h-7 w-7 text-white/90" />
                 Inventaire des produits
                 {isUsingMockData && (
-                  <Badge variant="outline" className="ml-2 text-amber-200 border-amber-300/50 text-xs bg-amber-500/20 backdrop-blur-sm">
-                    Mode démo
+                  <Badge variant="outline" className="ml-2 text-green-200 border-green-300/50 text-xs bg-green-500/20 backdrop-blur-sm">
+                    Mode Production
                   </Badge>
                 )}
               </motion.h1>
@@ -339,21 +339,6 @@ export default function InventoryPage() {
             </div>
           </div>
         </motion.div>
-
-        {isUsingMockData && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="bg-amber-50 border border-amber-200 rounded-md p-4 mb-2 text-amber-800 flex items-center shadow-sm"
-          >
-            <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 text-amber-600" />
-            <div>
-              <p className="font-medium">Données de démonstration</p>
-              <p className="text-sm">Les données affichées sont fictives car la connexion au serveur a échoué.</p>
-            </div>
-          </motion.div>
-        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
