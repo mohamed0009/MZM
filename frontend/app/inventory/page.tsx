@@ -89,6 +89,7 @@ export default function InventoryPage() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [activeTab, setActiveTab] = useState("all")
   const [itemsPerPage] = useState(5) // Number of products per page
   const { inventory } = useApi()
   const { hasPermission } = useAuth()
@@ -219,6 +220,19 @@ export default function InventoryPage() {
     return matchesSearch && matchesCategory;
   });
 
+  // Get products with low stock
+  const filteredLowStockProducts = filteredProducts.filter(product => product.stock < 100);
+
+  // Get products expiring soon (within 3 months)
+  const filteredExpiringProducts = filteredProducts.filter(product => {
+    if (!product.expiry) return false;
+    const expiryDate = new Date(product.expiry);
+    const today = new Date();
+    const threeMonthsFromNow = new Date();
+    threeMonthsFromNow.setMonth(today.getMonth() + 3);
+    return expiryDate <= threeMonthsFromNow && expiryDate >= today;
+  });
+  
   // Sort products
   const sortedProducts = sortColumn 
     ? [...filteredProducts].sort((a, b) => {
@@ -233,19 +247,37 @@ export default function InventoryPage() {
       })
     : filteredProducts;
 
-  // Handle sort change
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortDirection('asc');
-    }
-  };
+  // Sort low stock products
+  const sortedLowStockProducts = sortColumn 
+    ? [...filteredLowStockProducts].sort((a, b) => {
+        const valueA = a[sortColumn] ?? '';
+        const valueB = b[sortColumn] ?? '';
+        
+        const comparison = typeof valueA === 'number' 
+          ? valueA - valueB
+          : String(valueA).localeCompare(String(valueB));
+          
+        return sortDirection === 'asc' ? comparison : -comparison;
+      })
+    : filteredLowStockProducts;
+
+  // Sort expiring products
+  const sortedExpiringProducts = sortColumn 
+    ? [...filteredExpiringProducts].sort((a, b) => {
+        const valueA = a[sortColumn] ?? '';
+        const valueB = b[sortColumn] ?? '';
+        
+        const comparison = typeof valueA === 'number' 
+          ? valueA - valueB
+          : String(valueA).localeCompare(String(valueB));
+          
+        return sortDirection === 'asc' ? comparison : -comparison;
+      })
+    : filteredExpiringProducts;
 
   // Get total number of products by stock status
   const totalProducts = products.length;
-  const lowStockProducts = products.filter(product => product.stock < 100).length;
+  const lowStockCount = products.filter(product => product.stock < 100).length;
   const mediumStockProducts = products.filter(product => product.stock >= 100 && product.stock < 200).length;
   const goodStockProducts = products.filter(product => product.stock >= 200).length;
 
@@ -272,6 +304,16 @@ export default function InventoryPage() {
           Bon
         </Badge>
       );
+    }
+  };
+
+  // Handle sort change
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
     }
   };
 
@@ -328,7 +370,7 @@ export default function InventoryPage() {
                   Réessayer
                 </Button>
               )}
-              {hasPermission("manage_inventory") && (
+              {hasPermission("inventory:create") && (
                 <Link href="/inventory/add">
                   <Button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border border-white/30 shadow-sm">
                     <Plus className="mr-2 h-4 w-4" />
@@ -408,7 +450,7 @@ export default function InventoryPage() {
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <CardTitle className="text-sm font-medium text-slate-500 mb-1">Stock bas</CardTitle>
-                <div className="text-2xl font-bold text-red-700">{lowStockProducts}</div>
+                <div className="text-2xl font-bold text-red-700">{lowStockCount}</div>
                 <p className="text-xs text-slate-500 mt-1">&lt; 100 unités</p>
               </CardContent>
             </Card>
@@ -421,7 +463,15 @@ export default function InventoryPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.5 }}
         >
-          <Tabs defaultValue="all" className="w-full">
+          <Tabs 
+            defaultValue="all" 
+            className="w-full" 
+            value={activeTab}
+            onValueChange={(value) => {
+              setActiveTab(value);
+              setCurrentPage(1); // Reset to first page when changing tabs
+            }}
+          >
             <div className="flex flex-col md:flex-row justify-between gap-4 pb-4">
               <TabsList className="bg-slate-100">
                 <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:text-blue-700">Tous les produits</TabsTrigger>
@@ -600,8 +650,8 @@ export default function InventoryPage() {
                                       <span className="sr-only">Détails</span>
                                     </Button>
                                   </Link>
-                                  {hasPermission("manage_inventory") && (
-                                    <Link href={`/inventory/edit/${product.id}`}>
+                                  {hasPermission("inventory:update") && (
+                                    <Link href={`/inventory/add`}>
                                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors rounded-full">
                                         <Pencil className="h-4 w-4" />
                                         <span className="sr-only">Modifier</span>
@@ -649,26 +699,380 @@ export default function InventoryPage() {
             </TabsContent>
             
             <TabsContent value="low-stock" className="mt-0">
-              <Card className="border-none rounded-xl shadow-md overflow-hidden">
-                <CardContent className="p-6 text-center bg-gradient-to-br from-blue-50 via-white to-blue-50">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2 text-blue-700">Filtre en développement</h3>
-                  <p className="text-slate-500">Cette fonctionnalité sera disponible prochainement.</p>
+              <Card className="border-slate-200 shadow-md rounded-xl border-none overflow-hidden">
+                <CardContent className="p-0">
+                  {loading ? (
+                    <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg">
+                      <div className="relative w-16 h-16 mx-auto mb-4">
+                        <div className="absolute inset-0 rounded-full border-t-2 border-r-2 border-red-500 animate-spin"></div>
+                        <div className="absolute inset-1 rounded-full border-t-2 border-red-400 animate-spin animate-delay-150"></div>
+                        <div className="absolute inset-2 rounded-full border-t-2 border-red-600 animate-spin animate-delay-300"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <AlertTriangle className="h-6 w-6 text-red-500" />
+                        </div>
+                      </div>
+                      <span className="text-slate-600 font-medium">Chargement des produits...</span>
+                    </div>
+                  ) : error && !isUsingMockData ? (
+                    <div className="bg-red-50 p-6 rounded-md text-red-700 flex items-start">
+                      <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h3 className="font-medium">Erreur de chargement</h3>
+                        <p>{error}</p>
+                      </div>
+                    </div>
+                  ) : sortedLowStockProducts.length === 0 ? (
+                    <div className="text-center p-12 text-slate-500">
+                      <div className="max-w-md mx-auto">
+                        <p className="text-lg font-medium mb-2">Aucun produit avec un stock bas</p>
+                        <p className="text-sm">Tous vos produits ont des niveaux de stock adéquats (plus de 100 unités).</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader className="bg-gradient-to-r from-red-50 to-red-100/50">
+                          <TableRow className="hover:bg-red-50/70 border-b border-red-200/50">
+                            <TableHead 
+                              className="cursor-pointer hover:text-red-700 transition-colors"
+                              onClick={() => handleSort('name')}
+                            >
+                              <div className="flex items-center">
+                                Nom
+                                {sortColumn === 'name' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-red-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead 
+                              className="cursor-pointer hover:text-red-700 transition-colors"
+                              onClick={() => handleSort('price')}
+                            >
+                              <div className="flex items-center">
+                                Prix
+                                {sortColumn === 'price' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-red-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead 
+                              className="cursor-pointer hover:text-red-700 transition-colors"
+                              onClick={() => handleSort('stock')}
+                            >
+                              <div className="flex items-center">
+                                Stock
+                                {sortColumn === 'stock' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-red-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead 
+                              className="cursor-pointer hover:text-red-700 transition-colors"
+                              onClick={() => handleSort('category')}
+                            >
+                              <div className="flex items-center">
+                                Catégorie
+                                {sortColumn === 'category' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-red-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead 
+                              className="cursor-pointer hover:text-red-700 transition-colors"
+                              onClick={() => handleSort('expiry')}
+                            >
+                              <div className="flex items-center">
+                                Date d'expiration
+                                {sortColumn === 'expiry' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-red-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {Array.isArray(sortedLowStockProducts) && sortedLowStockProducts
+                            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                            .map((product, index) => (
+                            <TableRow key={product.id} className="hover:bg-red-50/40 border-b border-slate-200 transition-colors">
+                              <TableCell className="font-medium text-red-700">{product.name}</TableCell>
+                              <TableCell className="max-w-xs truncate">{product.description}</TableCell>
+                              <TableCell className="font-medium">{formatPrice(product.price)}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center">
+                                  <span className="mr-2">{product.stock || 0}</span>
+                                  <Badge className="bg-red-50 text-red-700 border border-red-200 hover:bg-red-100">
+                                    <AlertTriangle className="h-3 w-3 mr-1" />
+                                    Bas
+                                  </Badge>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium">
+                                  {product.category || 'Non catégorisé'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>{product.expiry || 'N/A'}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Link href={`/inventory/${product.id}`}>
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-red-700 hover:bg-red-50 transition-colors rounded-full">
+                                      <Eye className="h-4 w-4" />
+                                      <span className="sr-only">Détails</span>
+                                    </Button>
+                                  </Link>
+                                  {hasPermission("inventory:update") && (
+                                    <Link href={`/inventory/add`}>
+                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-red-700 hover:bg-red-50 transition-colors rounded-full">
+                                        <Pencil className="h-4 w-4" />
+                                        <span className="sr-only">Modifier</span>
+                                      </Button>
+                                    </Link>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
                 </CardContent>
+                {!loading && !error && sortedLowStockProducts.length > 0 && (
+                  <CardFooter className="flex justify-between items-center py-4 bg-gradient-to-r from-slate-50 to-red-50/30 border-t border-red-100/50">
+                    <div className="text-sm text-slate-500">
+                      Page <span className="font-medium text-red-700">{currentPage}</span> sur <span className="font-medium text-red-700">{Math.ceil(sortedLowStockProducts.length / itemsPerPage)}</span> · 
+                      Total: <span className="font-medium text-red-700">{sortedLowStockProducts.length}</span> produits
+                    </div>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 bg-white hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition-colors"
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        Précédent
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 bg-white hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition-colors"
+                        onClick={() => setCurrentPage(Math.min(Math.ceil(sortedLowStockProducts.length / itemsPerPage), currentPage + 1))}
+                        disabled={currentPage >= Math.ceil(sortedLowStockProducts.length / itemsPerPage)}
+                      >
+                        Suivant
+                      </Button>
+                    </div>
+                  </CardFooter>
+                )}
               </Card>
             </TabsContent>
             
             <TabsContent value="expiring" className="mt-0">
-              <Card className="border-none rounded-xl shadow-md overflow-hidden">
-                <CardContent className="p-6 text-center bg-gradient-to-br from-blue-50 via-white to-blue-50">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2 text-blue-700">Filtre en développement</h3>
-                  <p className="text-slate-500">Cette fonctionnalité sera disponible prochainement.</p>
+              <Card className="border-slate-200 shadow-md rounded-xl border-none overflow-hidden">
+                <CardContent className="p-0">
+                  {loading ? (
+                    <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg">
+                      <div className="relative w-16 h-16 mx-auto mb-4">
+                        <div className="absolute inset-0 rounded-full border-t-2 border-r-2 border-amber-500 animate-spin"></div>
+                        <div className="absolute inset-1 rounded-full border-t-2 border-amber-400 animate-spin animate-delay-150"></div>
+                        <div className="absolute inset-2 rounded-full border-t-2 border-amber-600 animate-spin animate-delay-300"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <AlertCircle className="h-6 w-6 text-amber-500" />
+                        </div>
+                      </div>
+                      <span className="text-slate-600 font-medium">Chargement des produits...</span>
+                    </div>
+                  ) : error && !isUsingMockData ? (
+                    <div className="bg-red-50 p-6 rounded-md text-red-700 flex items-start">
+                      <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h3 className="font-medium">Erreur de chargement</h3>
+                        <p>{error}</p>
+                      </div>
+                    </div>
+                  ) : sortedExpiringProducts.length === 0 ? (
+                    <div className="text-center p-12 text-slate-500">
+                      <div className="max-w-md mx-auto">
+                        <p className="text-lg font-medium mb-2">Aucun produit à expiration proche</p>
+                        <p className="text-sm">Tous vos produits ont une date d'expiration éloignée (plus de 3 mois).</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader className="bg-gradient-to-r from-amber-50 to-amber-100/50">
+                          <TableRow className="hover:bg-amber-50/70 border-b border-amber-200/50">
+                            <TableHead 
+                              className="cursor-pointer hover:text-amber-700 transition-colors"
+                              onClick={() => handleSort('name')}
+                            >
+                              <div className="flex items-center">
+                                Nom
+                                {sortColumn === 'name' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-amber-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead 
+                              className="cursor-pointer hover:text-amber-700 transition-colors"
+                              onClick={() => handleSort('price')}
+                            >
+                              <div className="flex items-center">
+                                Prix
+                                {sortColumn === 'price' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-amber-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead 
+                              className="cursor-pointer hover:text-amber-700 transition-colors"
+                              onClick={() => handleSort('stock')}
+                            >
+                              <div className="flex items-center">
+                                Stock
+                                {sortColumn === 'stock' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-amber-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead 
+                              className="cursor-pointer hover:text-amber-700 transition-colors"
+                              onClick={() => handleSort('category')}
+                            >
+                              <div className="flex items-center">
+                                Catégorie
+                                {sortColumn === 'category' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-amber-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead 
+                              className="cursor-pointer hover:text-amber-700 transition-colors"
+                              onClick={() => handleSort('expiry')}
+                            >
+                              <div className="flex items-center">
+                                Date d'expiration
+                                {sortColumn === 'expiry' && (
+                                  <ArrowUpDown className={cn(
+                                    "ml-1 h-4 w-4 text-amber-600", 
+                                    sortDirection === 'asc' ? "rotate-0" : "rotate-180"
+                                  )} />
+                                )}
+                              </div>
+                            </TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {Array.isArray(sortedExpiringProducts) && sortedExpiringProducts
+                            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                            .map((product, index) => (
+                            <TableRow key={product.id} className="hover:bg-amber-50/40 border-b border-slate-200 transition-colors">
+                              <TableCell className="font-medium text-amber-700">{product.name}</TableCell>
+                              <TableCell className="max-w-xs truncate">{product.description}</TableCell>
+                              <TableCell className="font-medium">{formatPrice(product.price)}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center">
+                                  <span className="mr-2">{product.stock || 0}</span>
+                                  {getStockStatus(product.stock || 0)}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium">
+                                  {product.category || 'Non catégorisé'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className="bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100">
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                  {product.expiry || 'N/A'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Link href={`/inventory/${product.id}`}>
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-amber-700 hover:bg-amber-50 transition-colors rounded-full">
+                                      <Eye className="h-4 w-4" />
+                                      <span className="sr-only">Détails</span>
+                                    </Button>
+                                  </Link>
+                                  {hasPermission("inventory:update") && (
+                                    <Link href={`/inventory/add`}>
+                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-amber-700 hover:bg-amber-50 transition-colors rounded-full">
+                                        <Pencil className="h-4 w-4" />
+                                        <span className="sr-only">Modifier</span>
+                                      </Button>
+                                    </Link>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
                 </CardContent>
+                {!loading && !error && sortedExpiringProducts.length > 0 && (
+                  <CardFooter className="flex justify-between items-center py-4 bg-gradient-to-r from-slate-50 to-amber-50/30 border-t border-amber-100/50">
+                    <div className="text-sm text-slate-500">
+                      Page <span className="font-medium text-amber-700">{currentPage}</span> sur <span className="font-medium text-amber-700">{Math.ceil(sortedExpiringProducts.length / itemsPerPage)}</span> · 
+                      Total: <span className="font-medium text-amber-700">{sortedExpiringProducts.length}</span> produits
+                    </div>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 bg-white hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200 transition-colors"
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        Précédent
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 bg-white hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200 transition-colors"
+                        onClick={() => setCurrentPage(Math.min(Math.ceil(sortedExpiringProducts.length / itemsPerPage), currentPage + 1))}
+                        disabled={currentPage >= Math.ceil(sortedExpiringProducts.length / itemsPerPage)}
+                      >
+                        Suivant
+                      </Button>
+                    </div>
+                  </CardFooter>
+                )}
               </Card>
             </TabsContent>
           </Tabs>
