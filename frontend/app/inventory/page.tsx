@@ -91,6 +91,7 @@ export default function InventoryPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [activeTab, setActiveTab] = useState("all")
   const [itemsPerPage] = useState(5) // Number of products per page
+  const [refreshTrigger, setRefreshTrigger] = useState(0) // Add a state to force refresh
   const { inventory } = useApi()
   const { hasPermission } = useAuth()
   
@@ -143,21 +144,72 @@ export default function InventoryPage() {
       setLoading(true)
       setError(null)
       
+      // Try to get cached data first while we're loading
+      const cachedData = localStorage.getItem('inventoryProducts')
+      if (cachedData) {
+        try {
+          const parsedData = JSON.parse(cachedData)
+          setProducts(parsedData)
+        } catch (e) {
+          console.error("Error parsing cached data:", e)
+        }
+      }
+      
       const productsData = await inventory.getProducts()
       
       // Check if the returned data is an array, if not create an empty array
       if (Array.isArray(productsData) && productsData.length > 0) {
         setProducts(productsData)
         setIsUsingMockData(false)
+        
+        // Cache the successful response
+        try {
+          localStorage.setItem('inventoryProducts', JSON.stringify(productsData))
+          localStorage.setItem('inventoryLastFetch', new Date().toISOString())
+        } catch (e) {
+          console.error("Error caching product data:", e)
+        }
       } else {
-        console.log("No products returned from API, using mock data")
-        setProducts(MOCK_PRODUCTS)
+        // Check if we have any recently added products in localStorage
+        const newProducts = localStorage.getItem('newlyAddedProducts')
+        let combinedProducts = [...MOCK_PRODUCTS]
+        
+        if (newProducts) {
+          try {
+            const parsedNewProducts = JSON.parse(newProducts)
+            // Add ID to each product if it doesn't have one
+            const productsWithIds = parsedNewProducts.map((product: any, index: number) => ({
+              ...product,
+              id: product.id || `local-${Date.now()}-${index}`
+            }))
+            combinedProducts = [...productsWithIds, ...MOCK_PRODUCTS]
+          } catch (e) {
+            console.error("Error parsing newly added products:", e)
+          }
+        }
+        
+        console.log("No products returned from API, using mock and local data")
+        setProducts(combinedProducts)
         setIsUsingMockData(true)
       }
     } catch (err: any) {
       console.error("Error fetching products:", err)
-      // Use mock data on error
-      setProducts(MOCK_PRODUCTS)
+      
+      // Try to get any newly added products from localStorage
+      const newProducts = localStorage.getItem('newlyAddedProducts')
+      let combinedProducts = [...MOCK_PRODUCTS]
+      
+      if (newProducts) {
+        try {
+          const parsedNewProducts = JSON.parse(newProducts)
+          combinedProducts = [...parsedNewProducts, ...MOCK_PRODUCTS]
+        } catch (e) {
+          console.error("Error parsing newly added products:", e)
+        }
+      }
+      
+      // Use mock data plus any locally added products
+      setProducts(combinedProducts)
       setIsUsingMockData(true)
       
       // Save the original error message, but don't display it when using mock data
@@ -167,35 +219,72 @@ export default function InventoryPage() {
     }
   }
 
-  // Fetch products on component mount
+  // Check for URL parameters that signal we need to refresh
+  useEffect(() => {
+    const checkForRefreshSignal = () => {
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        if (url.searchParams.has('newProduct')) {
+          url.searchParams.delete('newProduct')
+          window.history.replaceState({}, '', url.toString())
+          setRefreshTrigger(prev => prev + 1) // Increment to trigger refresh
+        }
+      }
+    }
+    
+    // Run check immediately
+    checkForRefreshSignal()
+    
+    // Also set up listener for navigation events (when using Next.js router)
+    window.addEventListener('popstate', checkForRefreshSignal)
+    return () => {
+      window.removeEventListener('popstate', checkForRefreshSignal)
+    }
+  }, [])
+
+  // Fetch products on component mount or when refresh is triggered
   useEffect(() => {
     // Add a short timeout to ensure the component mounts properly
     const timer = setTimeout(() => {
-      fetchProducts();
-    }, 100);
+      fetchProducts()
+    }, 100)
 
     // Add a fallback timer to use mock data if loading takes too long
     const fallbackTimer = setTimeout(() => {
       if (loading) {
-        console.log("Loading timeout - using mock data");
-        setProducts(MOCK_PRODUCTS);
-        setIsUsingMockData(true);
-        setLoading(false);
+        console.log("Loading timeout - using mock data")
+        
+        // Try to get any newly added products from localStorage
+        const newProducts = localStorage.getItem('newlyAddedProducts')
+        let combinedProducts = [...MOCK_PRODUCTS]
+        
+        if (newProducts) {
+          try {
+            const parsedNewProducts = JSON.parse(newProducts)
+            combinedProducts = [...parsedNewProducts, ...MOCK_PRODUCTS]
+          } catch (e) {
+            console.error("Error parsing newly added products:", e)
+          }
+        }
+        
+        setProducts(combinedProducts)
+        setIsUsingMockData(true)
+        setLoading(false)
       }
-    }, 1500);
+    }, 1500)
 
     return () => {
-      clearTimeout(timer);
-      clearTimeout(fallbackTimer);
-    };
-  }, []);
+      clearTimeout(timer)
+      clearTimeout(fallbackTimer)
+    }
+  }, [refreshTrigger]) // Depend on refreshTrigger to force refresh
 
   // Function to handle retrying connection to the server
   const handleRetry = () => {
-    setLoading(true);
-    setError(null);
-    fetchProducts();
-  };
+    setLoading(true)
+    setError(null)
+    setRefreshTrigger(prev => prev + 1) // Force refresh
+  }
 
   // Handle product price safely
   const formatPrice = (price: any) => {
@@ -709,7 +798,7 @@ export default function InventoryPage() {
                         <div className="absolute inset-2 rounded-full border-t-2 border-red-600 animate-spin animate-delay-300"></div>
                         <div className="absolute inset-0 flex items-center justify-center">
                           <AlertTriangle className="h-6 w-6 text-red-500" />
-                        </div>
+                  </div>
                       </div>
                       <span className="text-slate-600 font-medium">Chargement des produits...</span>
                     </div>
